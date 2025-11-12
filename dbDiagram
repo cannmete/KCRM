@@ -1,0 +1,43 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+// This is for dbDiagram
+
+Table Users {
+  id integer [primary key]
+  username varchar
+  passwordHash varbinary
+  passwordSalt varbinary
+  email nvarchar
+  role integer
+}
+
+
+Table Tasks {
+  id integer [primary key]
+  taskType integer
+  title nvarchar
+  description nvarchar
+  isCompleted bit
+  dueDate datetime2
+  createdAt datetime2
+  userId integer
+  customerId integer
+
+
+}
+
+Table Customers {
+  id integer [primary key]
+  fullName nvarchar
+  email nvarchar
+  phone nvarchar
+  address nvarchar
+  createdAt datetime2
+  isActive bit
+
+}
+
+Ref: "Tasks"."userId" < "Users"."id"
+
+Ref: "Customers"."id" < "Tasks"."customerId"
