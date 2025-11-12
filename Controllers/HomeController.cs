@@ -1,21 +1,42 @@
 using System.Diagnostics;
 using KCRM.Models;
+using KCRM.Data;
+using KCRM.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace KCRM.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ApplicationDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        // Logger ve DbContext inject
+        public HomeController(ILogger<HomeController> logger, ApplicationDbContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        // Dashboard
+        public async Task<IActionResult> Index()
         {
-            return View();
+            // Müþterileri ve görevlerini çek
+            var customers = await _context.Customers
+                .Include(c => c.Tasks)
+                .ToListAsync();
+
+            // ViewModel oluþtur
+            var model = new DashboardViewModel
+            {
+                Customers = customers,
+                TotalCustomers = customers.Count,
+                TotalTasks = customers.Sum(c => c.Tasks?.Count ?? 0)
+            };
+
+            return View(model);
         }
 
         public IActionResult Privacy()
