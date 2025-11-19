@@ -4,10 +4,15 @@ namespace KCRM.ViewModels
 {
     public class LoginViewModel
     {
-        [Required]
-        public string Username { get; set; } = null!;
+        [Display(Name = "Kullanıcı Adı")]
+        [Required(ErrorMessage = "Kullanıcı Adı Giriniz!")]
+        public string Username { get; set; }
 
-        [Required, DataType(DataType.Password)]
-        public string Password { get; set; } = null!;
+        [Display(Name = "Parola")]
+        [Required(ErrorMessage = "Parola Giriniz!")]
+        public string Password { get; set; }
+
+        [Display(Name = "Beni Hatırla")]
+        public bool KeepMe { get; set; }
     }
 }

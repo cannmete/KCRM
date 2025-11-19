@@ -12,5 +12,7 @@ namespace KCRM.Data
         public DbSet<User> Users => Set<User>();
         public DbSet<Customer> Customers => Set<Customer>();
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
+        public DbSet<Notes> Notes { get; set; }
+
     }
 }

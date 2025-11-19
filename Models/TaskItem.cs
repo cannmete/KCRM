@@ -13,6 +13,7 @@ namespace KCRM.Models
 
         [MaxLength(300)]
         public string? Description { get; set; }
+        public int IsDeleted { get; set; }
 
         public bool IsCompleted { get; set; } = false;
 

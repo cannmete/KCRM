@@ -1,0 +1,29 @@
+﻿@model KCRM.Models.Notes
+@{
+    ViewData["Title"] = "Not Ekle";
+    Layout = "_LayoutSbAdmin";
+}
+<h2>Yeni Not Ekle</h2>
+
+<form asp-action="Add" method="post">
+    <div class="form-group">
+        <label>İçerik</label>
+        <textarea asp-for="Content" class="form-control"></textarea>
+        <span asp-validation-for="Content" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <label>User ID</label>
+        <input asp-for="UserId" class="form-control" />
+        <span asp-validation-for="UserId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-success mt-3">Kaydet</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

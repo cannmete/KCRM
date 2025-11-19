@@ -19,6 +19,7 @@ namespace KCRM.Models
 
         [MaxLength(200)]
         public string? Address { get; set; }
+        public int IsDeleted { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

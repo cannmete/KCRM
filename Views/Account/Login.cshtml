@@ -9,7 +9,7 @@
         <div class="col-md-5 col-lg-4">
             <div class="card shadow-lg">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3>Giriş Yap</h3>
+                    <h3>Hoşgeldiniz !</h3>
                 </div>
                 <div class="card-body">
                     <form asp-action="Login" method="post">
@@ -23,11 +23,14 @@
                             <input asp-for="Password" type="password" class="form-control" placeholder="Şifrenizi girin" />
                             <span asp-validation-for="Password" class="text-danger"></span>
                         </div>
+                        <div class="mb-3">
+                             <input type="checkbox" class="custom-control-input" asp-for="KeepMe">
+                             <label class="custom-control-label" asp-for="KeepMe"></label>
+
+                        </div>
                         <div class="d-grid">
                             <button type="submit" class="btn btn-primary">Giriş Yap</button>
                         </div>
-                        <p class="mt-3 text-center">
-                            Hesabınız yok mu? <a asp-action="Register">Kayıt Ol</a>
                         </p>
                     </form>
                 </div>
