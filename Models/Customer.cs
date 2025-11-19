@@ -29,5 +29,7 @@ namespace KCRM.Models
         public User? User { get; set; }
 
         public ICollection<TaskItem>? Tasks { get; set; }
+
+        public bool IsLead { get; set; } = true; // Yeni müşteri mi (lead) yoksa mevcut müşteri mi (customer) kontrolü içindir.
     }
 }

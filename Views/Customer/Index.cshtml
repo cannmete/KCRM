@@ -1,0 +1,72 @@
+﻿@model KCRM.ViewModels.CustomerIndexViewModel
+@{
+    ViewData["Title"] = "Müşteriler";
+    Layout = "_LayoutSbAdmin";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Müşteriler</h2>
+    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+        Yeni Müşteri Ekle
+    </button>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCustomerLabel">Yeni Müşteri Ekle</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                @await Html.PartialAsync("_AddCustomerPartial", new KCRM.Models.Customer())
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- Yeni Müşteriler -->
+        <div class="col-md-6">
+            <h4>Yeni Müşteriler</h4>
+            @foreach(var c in Model.Customers)
+            {
+                <div class="card mb-3 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@c.FullName</h5>
+                        <p class="card-text">
+                            <strong>Email:</strong> @c.Email <br />
+                            <strong>Telefon:</strong> @c.Phone <br />
+                            <strong>Adres:</strong> @c.Address <br />
+                            <strong>Görev Sayısı:</strong> @(c.Tasks?.Count ?? 0)
+                        </p>
+                        <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-info">Detay</a>
+                        <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Potansiyel Müşteriler -->
+        <div class="col-md-6">
+            <h4>Potansiyel Müşteriler</h4>
+            @foreach(var c in Model.Leads)
+            {
+                <div class="card mb-3 shadow-sm border-warning">
+                    <div class="card-body">
+                        <h5 class="card-title">@c.FullName</h5>
+                        <p class="card-text">
+                            <strong>Email:</strong> @c.Email <br />
+                            <strong>Telefon:</strong> @c.Phone <br />
+                            <strong>Adres:</strong> @c.Address <br />
+                            <strong>Görev Sayısı:</strong> @(c.Tasks?.Count ?? 0)
+                        </p>
+                        <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-info">Detay</a>
+                        <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

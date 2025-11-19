@@ -17,6 +17,7 @@ namespace KCRM.Models
 
         [Required]
         public byte[] PasswordSalt { get; set; }
+        public string Role { get; set; } = "User";  // User - Admin gibi roller için.
 
         public ICollection<Customer>? Customers { get; set; }
         public ICollection<TaskItem>? Tasks { get; set; }
