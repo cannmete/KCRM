@@ -2,7 +2,7 @@
 
 Overview
 
-This is a Customer Relationship Management (CRM) system currently under development, built with .NET 9.0 and a SQL Server database. The system is designed to help manage customers, tasks, reports, and settings efficiently in a web-based environment.
+This is a Customer Relationship Management (CRM) system currently under development, built with .NET 9.0 and a MySQL database. The system is designed to help manage customers, tasks, reports, and settings efficiently in a web-based environment.
 
 Status
 
