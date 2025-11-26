@@ -1,43 +1,51 @@
-// Use DBML to define your database structure
-// Docs: https://dbml.dbdiagram.io/docs
+Table notes {
+  Id integer [primary key]
+  Content varchar
+  UserId integer [not null]
+  IsDeleted integer
+}
 
-// This is for dbDiagram
+Table users {
+  Id integer [primary key]
+  Username varchar
+  Email varchar
+  Role varchar 
+  PasswordSalt longblob
+  PasswordHash longblob
+}
 
-Table Users {
-  id integer [primary key]
-  username varchar
-  passwordHash varbinary
-  passwordSalt varbinary
-  email nvarchar
-  role integer
+Table tasks {
+  Id integer [primary key]
+  Title varchar
+  Description varchar
+  UserId integer [not null]
+  CustomerId integer
+  IsDeleted integer
+  IsCompleted integer
+  CreatedAt datetime
+  DueDate datetime
+  
+}
+
+Table customers {
+  Id integer
+  FullName varchar
+  Email varchar
+  Phone varchar
+  Adress varchar
+  IsDeleted integer
+  CreatedAt datetime
+  UserId integer
+  IsLead tinyint
 }
 
 
-Table Tasks {
-  id integer [primary key]
-  taskType integer
-  title nvarchar
-  description nvarchar
-  isCompleted bit
-  dueDate datetime2
-  createdAt datetime2
-  userId integer
-  customerId integer
 
 
-}
+Ref: "users"."Id" < "notes"."UserId"
 
-Table Customers {
-  id integer [primary key]
-  fullName nvarchar
-  email nvarchar
-  phone nvarchar
-  address nvarchar
-  createdAt datetime2
-  isActive bit
+Ref: "tasks"."CustomerId" < "customers"."Id"
 
-}
+Ref: "tasks"."UserId" < "users"."Id"
 
-Ref: "Tasks"."userId" < "Users"."id"
-
-Ref: "Customers"."id" < "Tasks"."customerId"
+Ref: "customers"."UserId" < "users"."Id"
