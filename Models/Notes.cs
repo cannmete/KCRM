@@ -7,13 +7,13 @@ namespace KCRM.Models
     {
         public int Id { get; set; }
 
-        [StringLength(500)]
         [Required(ErrorMessage = "Lütfen içerik giriniz.")]
         public string Content { get; set; }
-
-        [Required(ErrorMessage = "Lütfen UserId belirtiniz.")]
-        public int UserId { get; set; }
-
+        [Required]
+        public int UserId { get; set;   }
+        public User User { get; set; } = null!; // Nullable olamaz.
+        public int? CustomerId { get; set; } // Müşteri ID'sini saklamak için
+        public Customer? Customer { get; set; } // Müşteri nesnesine navigasyon için
         public int IsDeleted { get; set; }
     }
 }

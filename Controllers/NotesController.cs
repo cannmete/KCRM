@@ -1,8 +1,11 @@
 ﻿using KCRM.Data;
 using KCRM.Models;
+using KCRM.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 
@@ -21,6 +24,7 @@ namespace KCRM.Controllers
         public async Task<IActionResult> Index()
         {
             var notes = await _context.Notes
+                .Include(n => n.User)
                 .Where(n => n.IsDeleted == 0)
                 .ToListAsync();
 
@@ -41,21 +45,59 @@ namespace KCRM.Controllers
         }
 
         // GET: Notes/Add
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
-            return View();
+            // Yalnızca silinmemiş müşterileri listeye alıyoruz
+            var customers = await _context.Customers
+                .Where(c => c.IsDeleted == 0)
+                .Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(), // Seçenek değeri (CustomerId)
+                    Text = c.FullName        // Görünecek metin
+                })
+                .ToListAsync();
+
+            var model = new NotesAddViewModel
+            {
+                // Müşteri listesini ViewModel'e ekle
+                CustomerList = customers
+            };
+
+            return View(model);
         }
 
-        // POST: Notes/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add([Bind("Content,UserId")] Notes note)
+        public async Task<IActionResult> Add(NotesAddViewModel model) // Parametre olarak NotesAddViewModel alınmalı
         {
-            if (!ModelState.IsValid) return View(note);
+            // ModelState.IsValid kontrolünü View'e geri döndürürken (GET metodu) yapmalıyız. 
+            // Ancak eğer View'in kendisi (yani müşteriler listesi) formdan gelmiyorsa...
+            if (!ModelState.IsValid)
+            {
+                // Validasyon başarısız olursa, müşteri listesini tekrar yükleyip View'e dönmeliyiz.
+                model.CustomerList = await _context.Customers
+                    .Where(c => c.IsDeleted == 0)
+                    .Select(c => new SelectListItem { Value = c.Id.ToString(), Text = c.FullName })
+                    .ToListAsync();
+                return View(model);
+            }
 
+            // 1. UserId'yi Otomatik Atama
+            // ClaimTypes.NameIdentifier, kimlik doğrulaması yapılmış kullanıcının ID'sidir.
+            var userId = int.Parse(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
+
+            // 2. Not nesnesini ViewModel'den al ve zorunlu alanları ata
+            var note = model.Note;
+            note.UserId = userId; // GİRİŞ YAPAN KULLANICININ ID'si atanır
             note.IsDeleted = 0;
+
+            // Eğer Notes modelinizde CreatedAt yoksa, bu satırı kullanmayın.
+            // note.CreatedAt = DateTime.UtcNow; 
+
             _context.Add(note);
             await _context.SaveChangesAsync();
+
+            // Not kaydolduktan sonra kullanıcıyı Index sayfasına yönlendir.
             return RedirectToAction(nameof(Index));
         }
 

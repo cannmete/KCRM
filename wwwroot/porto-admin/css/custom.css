@@ -1,0 +1,4 @@
+.card-body {
+    /* Tüm kenarlara standart boþluk ekle */
+    padding: 20px !important;
+}

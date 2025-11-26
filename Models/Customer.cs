@@ -8,7 +8,7 @@ namespace KCRM.Models
     {
         public int Id { get; set; }
 
-        [Required, MaxLength(100)]
+        [Required]
         public string FullName { get; set; } = null!;
 
         [EmailAddress]
@@ -17,8 +17,8 @@ namespace KCRM.Models
         [Phone]
         public string? Phone { get; set; }
 
-        [MaxLength(200)]
-        public string? Address { get; set; }
+        [Required]
+        public string Address { get; set; } = null!;
         public int IsDeleted { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
