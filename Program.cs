@@ -1,5 +1,6 @@
 using KCRM.Data;
 using Microsoft.EntityFrameworkCore;
+using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,8 +12,10 @@ builder.Services.AddControllersWithViews();
 
 // EF Core
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(9, 5, 0)) // senin MySQL sürümün
+    ));
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
     {
@@ -36,6 +39,7 @@ app.UseHttpsRedirection();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseStaticFiles();
 
 app.MapStaticAssets();
 

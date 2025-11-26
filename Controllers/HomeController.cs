@@ -49,5 +49,11 @@ namespace KCRM.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        public IActionResult AccessDenied(string returnUrl)
+        {
+            TempData["AccessDenied"] = "Bu iþlemi yapma yetkiniz bulunmuyor!";
+            return RedirectToAction("Index", "Home");
+        }
     }
 }

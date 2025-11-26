@@ -1,35 +1,62 @@
-﻿@model IEnumerable<KCRM.Models.Notes>
+﻿@model List<KCRM.Models.Notes>
 @{
-    ViewData["Title"] = "Notlar";
-    Layout = "_LayoutSbAdmin";
+    ViewData["Title"] = "Tüm Notlar";
+    Layout = "_LayoutPorto"; // Porto Admin Layout'unuz
 }
-    
-<h2>Notlar</h2>
 
-<a asp-action="Add" class="btn btn-primary mb-3">Yeni Not Ekle</a>
+<section role="main" class="content-body">
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>Id</th>
-            <th>İçerik</th>
-            <th>User Id</th>
-            <th>İşlemler</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr>
-                <td>@item.Id</td>
-                <td>@item.Content</td>
-                <td>@item.UserId</td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm">Detay</a>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning btn-sm">Düzenle</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">Sil</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <header class="page-header d-flex justify-content-between align-items-center mb-3">
+        <h2>Notlar</h2>
+        <a asp-action="Add" class="mb-1 mt-1 me-1 btn btn-success">
+            <i class="fas fa-plus"></i> Yeni Not Ekle
+        </a>
+    </header>
+
+    <section class="card card-modern">
+        <header class="card-header">
+            <h4 class="card-title">Not Listesi</h4>
+        </header>
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped mb-0" id="datatable-default">
+                    <thead>
+                        <tr>
+                            <th style="width: 5%;">ID</th>
+                            <th>İçerik</th>
+                            <th style="width: 15%;">Yazar</th>
+                            <th style="width: 15%;">İşlemler</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var note in Model)
+                        {
+                            <tr>
+                                <td>@note.Id</td>
+                                <td>@note.Content</td>
+                                <td>@(note.User?.Username ?? "Yazar Bilinmiyor")</td>
+                                <td class="actions">
+                                    <a asp-action="Details" asp-route-id="@note.Id" class="btn btn-sm btn-info me-1" title="Detay"><i class="fas fa-eye"></i></a>
+                                    <a asp-action="Edit" asp-route-id="@note.Id" class="btn btn-sm btn-warning me-1" title="Düzenle"><i class="fas fa-edit"></i></a>
+                                    <a asp-action="Delete" asp-route-id="@note.Id" class="btn btn-sm btn-danger" title="Sil"><i class="fas fa-trash"></i></a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+
+        </div>
+    </section>
+
+</section>
+
+@section Scripts {
+    @{
+        // DataTables ve Porto Admin'in diğer gerekli scriptleri burada yüklenmelidir.
+        // Bu scriptler _LayoutPorto.cshtml içinde mevcut olmalıdır.
+    }
+}

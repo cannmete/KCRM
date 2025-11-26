@@ -8,10 +8,8 @@ namespace KCRM.Models
     {
         public int Id { get; set; }
 
-        [Required, MaxLength(100)]
+        [Required]
         public string Title { get; set; } = null!;
-
-        [MaxLength(300)]
         public string? Description { get; set; }
         public int IsDeleted { get; set; }
 
@@ -25,7 +23,7 @@ namespace KCRM.Models
         // İlişkiler
         [ForeignKey("User")]
         public int UserId { get; set; }
-        public User? User { get; set; }
+        public User User { get; set; } = null!; // Nullable olamaz.
 
         [ForeignKey("Customer")]
         public int? CustomerId { get; set; }

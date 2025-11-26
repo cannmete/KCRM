@@ -1,29 +1,61 @@
-﻿@model KCRM.Models.Notes
+﻿@model KCRM.ViewModels.NotesAddViewModel
 @{
-    ViewData["Title"] = "Not Ekle";
-    Layout = "_LayoutSbAdmin";
+    ViewData["Title"] = "Yeni Not Ekle";
+    Layout = "_LayoutPorto";
 }
-<h2>Yeni Not Ekle</h2>
 
-<form asp-action="Add" method="post">
-    <div class="form-group">
-        <label>İçerik</label>
-        <textarea asp-for="Content" class="form-control"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>@ViewData["Title"]</h2>
+    </header>
+
+    <div class="row">
+        <div class="col-lg-8">
+            @* Formu daha dar bir kolonda tutmak için *@
+            <section class="card card-modern">
+                <div class="card-body">
+
+                    <form asp-action="Add" method="post">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">İlgili Müşteri</label>
+                            <select asp-for="Note.CustomerId"
+                                    class="form-control"
+                                    asp-items="Model.CustomerList">
+                                <option value="">--- Müşteri Seçiniz ---</option>
+                            </select>
+                            @* CustomerId'yi Notes modeline eklemeniz gerekir! (Aşağıdaki nota bakın) *@
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Not İçeriği</label>
+                            <textarea asp-for="Note.Content" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Note.Content" class="text-danger"></span>
+                        </div>
+
+                        @* UserId, Controller'da atandığı için formda gizli tutulur veya hiç gönderilmez.
+                           Ancak View'de model kullanıldığı için gizli alanla modeli bağlıyoruz. *@
+                        <input type="hidden" asp-for="Note.UserId" value="0" />
+
+                        <div class="form-group text-end mt-4">
+                            <a asp-action="Index" class="btn btn-default me-2">Geri Dön</a>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </section>
+        </div>
     </div>
 
-    <div class="form-group mt-3">
-        <label>User ID</label>
-        <input asp-for="UserId" class="form-control" />
-        <span asp-validation-for="UserId" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-success mt-3">Kaydet</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
-</form>
+</section>
 
 @section Scripts {
     @{
+        // Validasyon scriptleri
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

@@ -64,7 +64,7 @@ namespace KCRM.Controllers
         // POST: Customer/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add([Bind("FullName,Email,Phone,Address,UserId")] Customer customer)
+        public async Task<IActionResult> Add([Bind("FullName,Email,Phone,Address,UserId,IsLead")] Customer customer)
         {
             if (!ModelState.IsValid)
                 return View(customer);

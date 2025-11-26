@@ -1,0 +1,151 @@
+﻿@{
+    // Bu dosya ana Layout olduğu için 'Layout = null;' satırına gerek yoktur.
+}
+
+<!doctype html>
+<html class="fixed sidebar-left-collapsed">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>KCRM - @ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="~/porto-admin/vendor/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/porto-admin/vendor/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/porto-admin/css/theme.css" />
+    <link rel="stylesheet" href="~/porto-admin/css/custom.css" />
+
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+
+<body>
+    <section class="body">
+
+        <header class="header">
+            <div class="logo-container">
+                <a href="/" class="logo">
+                    <span class="h3 text-black">KCRM</span>
+                </a>
+                <div class="d-md-none toggle-sidebar-left" data-toggle-class="sidebar-left-opened">
+                    <i class="fas fa-bars" aria-label="Toggle sidebar"></i>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <div id="userbox" class="userbox">
+                    <a href="#" data-bs-toggle="dropdown">
+                        <figure class="profile-picture">
+                            <img src="~/img/undraw_profile.svg" class="rounded-circle" alt="Profil Resmi" />
+                        </figure>
+                        <span class="profile-info">
+                            <span class="name">@User.Identity.Name</span>
+                            <span class="role">Admin</span>
+                        </span>
+                    </a>
+
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                            <i class="fas fa-user"></i> Profilim
+                        </a>
+                        <a class="dropdown-item" asp-controller="Account" asp-action="Settings">
+                            <i class="fas fa-cog"></i> Ayarlar
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form method="post" asp-controller="Account" asp-action="Logout">
+                            <button class="dropdown-item">
+                                <i class="fas fa-power-off"></i> Çıkış Yap
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </header>
+        <div class="inner-wrapper">
+
+            <aside id="sidebar-left" class="sidebar-left">
+
+                <div class="sidebar-header">
+                    <div class="sidebar-title">
+                        Menü
+                    </div>
+                </div>
+
+                <div class="nano">
+                    <div class="nano-content">
+                        <nav class="nav-main">
+                            <ul class="nav nav-main">
+                                <li>
+                                    <a asp-controller="Home" asp-action="Index">
+                                        <i class="fas fa-home"></i>
+                                        <span>Dashboard</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Customer" asp-action="Index">
+                                        <i class="fas fa-users"></i>
+                                        <span>Müşteriler</span>
+                                    </a>
+                                </li>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <li>
+                                        <a asp-controller="Admin" asp-action="UserList">
+                                            <i class="fas fa-user-shield"></i>
+                                            <span>Kullanıcı Yönetimi</span>
+                                        </a>
+                                    </li>
+                                }
+                                <li>
+                                    <a asp-controller="Notes" asp-action="Index">
+                                        <i class="fas fa-sticky-note"></i>
+                                        <span>Notlar</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Tasks" asp-action="Index">
+                                        <i class="fas fa-tasks"></i>
+                                        <span>Görevler</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Settings" asp-action="Index">
+                                        <i class="fas fa-cog"></i>
+                                        <span>Ayarlar</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </aside>
+            <section role="main" class="content-body">
+                <div class="container-fluid pt-3">
+                    @RenderBody()
+                </div>
+            </section>
+        </div> @* inner-wrapper sonu *@
+
+
+        <footer class="footer text-center py-3">
+            <span>&copy; @DateTime.Now.Year Can METE</span>
+        </footer>
+
+    </section> @* body section sonu *@
+
+    <script src="~/porto-admin/vendor/jquery/jquery.js"></script>
+
+    <script src="~/porto-admin/vendor/popper/umd/popper.min.js"></script>
+    <script src="~/porto-admin/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
+
+    <script src="~/porto-admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <script src="~/porto-admin/vendor/nanoscroller/nanoscroller.js"></script>
+    <script src="~/porto-admin/vendor/magnific-popup/jquery.magnific-popup.js"></script>
+    <script src="~/porto-admin/js/theme.js"></script>
+    <script src="~/porto-admin/js/custom.js"></script>
+    <script src="~/porto-admin/js/theme.init.js"></script>
+
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+
+</html>

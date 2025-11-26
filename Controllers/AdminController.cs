@@ -38,7 +38,7 @@ namespace KCRM.Controllers
             user.Role = role;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Users");
+            return RedirectToAction("UserList");
         }
     }
 }
