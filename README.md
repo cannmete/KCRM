@@ -28,7 +28,7 @@ Icons & UI Enhancements: Uses Font Awesome for icons.
 
 Genel Bakış
 
-Bu proje, .NET 9.0 ve SQL Server veritabanı kullanılarak geliştirilmiş bir Müşteri İlişkileri Yönetimi (CRM) sistemidir ve henüz geliştirilme aşamasındadır. Sistem, müşteri yönetimi, görev takibi, raporlar ve ayarları web tabanlı bir ortamda yönetmeyi kolaylaştırmayı amaçlamaktadır.
+Bu proje, .NET 9.0 ve MySQL veritabanı kullanılarak geliştirilmiş bir Müşteri İlişkileri Yönetimi (CRM) sistemidir ve henüz geliştirilme aşamasındadır. Sistem, müşteri yönetimi, görev takibi, raporlar ve ayarları web tabanlı bir ortamda yönetmeyi kolaylaştırmayı amaçlamaktadır.
 
 Durum
 
