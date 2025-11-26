@@ -19,11 +19,13 @@
             <div class="modal-content">
 
                 <header class="card-header">
+                    @* Porto Admin Başlık Stili *@
                     <h2 class="card-title" id="addCustomerLabel">Yeni Müşteri Ekle</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </header>
 
                 <div class="card-body">
+                    @* Porto Admin İçerik Stili *@
                     @await Html.PartialAsync("_AddCustomerPartial", new KCRM.Models.Customer())
                 </div>
 
@@ -35,6 +37,7 @@
 
         <div class="col-lg-6">
             <section class="card card-modern">
+                @* Ana Kapsayıcı Kart *@
                 <header class="card-header">
                     <h4 class="card-title">Yeni Müşteriler</h4>
                 </header>
@@ -42,6 +45,7 @@
                     @foreach (var c in Model.Customers)
                     {
                         <div class="card card-modern card-border card-border-success mb-3">
+                            @* Bireysel Müşteri Kartı *@
                             <div class="card-body">
                                 <h5 class="card-title">@c.FullName</h5>
                                 <p class="card-text text-muted"><strong>Email:</strong> @c.Email</p>
@@ -61,6 +65,7 @@
 
         <div class="col-lg-6">
             <section class="card card-modern">
+                @* Ana Kapsayıcı Kart *@
                 <header class="card-header">
                     <h4 class="card-title">Potansiyel Müşteriler</h4>
                 </header>
@@ -68,6 +73,7 @@
                     @foreach (var c in Model.Leads)
                     {
                         <div class="card card-modern card-border card-border-warning mb-3">
+                            @* Bireysel Müşteri Kartı (Sınır Çizgisi Sarı) *@
                             <div class="card-body">
                                 <h5 class="card-title">@c.FullName</h5>
                                 <p class="card-text text-muted"><strong>Email:</strong> @c.Email</p>
@@ -88,8 +94,10 @@
     </div>
 
 </section>
+
 @section Scripts {
     @{
+        // Validasyon scriptleri Modal formunun doğru çalışması için buraya eklendi.
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
