@@ -25,26 +25,28 @@ namespace KCRM.Controllers
         {
             var notes = await _context.Notes
                 .Include(n => n.User)
+                .Include(n => n.Customer)
                 .Where(n => n.IsDeleted == 0)
                 .ToListAsync();
 
             return View(notes);
         }
 
-        // GET: Notes/Details/5
+        // GET: Notes/Details/5 (İyileştirildi: İlişkiler yüklendi)
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
 
             var note = await _context.Notes
+                .Include(n => n.User)
+                .Include(n => n.Customer) // Customer bilgisini de yüklüyoruz
                 .FirstOrDefaultAsync(n => n.Id == id && n.IsDeleted == 0);
 
             if (note == null) return NotFound();
-
             return View(note);
         }
 
-        // GET: Notes/Add
+        // GET: Notes/Add (ViewModel ile Müşteri Listesi Yüklendi)
         public async Task<IActionResult> Add()
         {
             // Yalnızca silinmemiş müşterileri listeye alıyoruz
@@ -59,19 +61,23 @@ namespace KCRM.Controllers
 
             var model = new NotesAddViewModel
             {
-                // Müşteri listesini ViewModel'e ekle
                 CustomerList = customers
             };
 
             return View(model);
         }
 
+        // POST: Notes/Add (ViewModel Kullanımı)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(NotesAddViewModel model) // Parametre olarak NotesAddViewModel alınmalı
+        public async Task<IActionResult> Add(NotesAddViewModel model)
         {
-            // ModelState.IsValid kontrolünü View'e geri döndürürken (GET metodu) yapmalıyız. 
-            // Ancak eğer View'in kendisi (yani müşteriler listesi) formdan gelmiyorsa...
+            // >>> BU SATIRI EKLEYİN VE ÇIKTI PENCERESİNİ İZLEYİN <<<
+            System.Diagnostics.Debug.WriteLine(">>> KONTROL EDİLİYOR: Gelen Müşteri ID: " + model.Note.CustomerId);
+            ModelState.Remove("Note.User");
+            ModelState.Remove("Note.UserId");
+            // Customer nesnesi de formdan gelmez, sadece ID gelir.
+            ModelState.Remove("Note.Customer");
             if (!ModelState.IsValid)
             {
                 // Validasyon başarısız olursa, müşteri listesini tekrar yükleyip View'e dönmeliyiz.
@@ -82,22 +88,18 @@ namespace KCRM.Controllers
                 return View(model);
             }
 
-            // 1. UserId'yi Otomatik Atama
-            // ClaimTypes.NameIdentifier, kimlik doğrulaması yapılmış kullanıcının ID'sidir.
-            var userId = int.Parse(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
+            // UserId'yi Otomatik Atama
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            // 2. Not nesnesini ViewModel'den al ve zorunlu alanları ata
             var note = model.Note;
-            note.UserId = userId; // GİRİŞ YAPAN KULLANICININ ID'si atanır
+            // DEBUG: Gelen CustomerId'yi Output penceresine yazdır
+            System.Diagnostics.Debug.WriteLine("GELEN CUSTOMER ID: " + note.CustomerId);
+            note.UserId = userId; // Otomatik atama bu aşamada oluyor.
             note.IsDeleted = 0;
-
-            // Eğer Notes modelinizde CreatedAt yoksa, bu satırı kullanmayın.
-            // note.CreatedAt = DateTime.UtcNow; 
 
             _context.Add(note);
             await _context.SaveChangesAsync();
 
-            // Not kaydolduktan sonra kullanıcıyı Index sayfasına yönlendir.
             return RedirectToAction(nameof(Index));
         }
 
@@ -106,27 +108,39 @@ namespace KCRM.Controllers
         {
             if (id == null) return NotFound();
 
-            var note = await _context.Notes.FindAsync(id);
+            // Edit formu için User ve Customer ilişkileri yüklenmeli (View'de kullanılabilir)
+            var note = await _context.Notes
+                .Include(n => n.Customer)
+                .FirstOrDefaultAsync(n => n.Id == id);
+
             if (note == null || note.IsDeleted == 1) return NotFound();
 
             return View(note);
         }
 
-        // POST: Notes/Edit/5
+        // POST: Notes/Edit/5 (Yetki Kontrolü ve Güvenlik İyileştirmesi)
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,UserId")] Notes incoming)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,UserId,CustomerId")] Notes incoming)
         {
             if (id != incoming.Id) return NotFound();
+
+            var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
             if (!ModelState.IsValid) return View(incoming);
 
             var existing = await _context.Notes.FindAsync(id);
             if (existing == null || existing.IsDeleted == 1) return NotFound();
 
-            // Sadece izin verilen alanları güncelle
+            // Yetki Kontrolü: Sadece notun sahibi veya Admin düzenleyebilir
+            if (existing.UserId != currentUserId && !User.IsInRole("Admin"))
+            {
+                return Forbid(); // 403 Yetki Reddi
+            }
+
+            // Güncelleme
             existing.Content = incoming.Content;
-            existing.UserId = incoming.UserId;
+            existing.CustomerId = incoming.CustomerId;
 
             try
             {
@@ -143,20 +157,21 @@ namespace KCRM.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // GET: Notes/Delete/5 (soft delete confirmation)
+        // GET: Notes/Delete/5 (Silme Onayı - İlişkiler Yüklendi)
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
 
             var note = await _context.Notes
+                .Include(n => n.User)
+                .Include(n => n.Customer) // Customer bilgisini de yüklüyoruz
                 .FirstOrDefaultAsync(n => n.Id == id && n.IsDeleted == 0);
 
             if (note == null) return NotFound();
-
             return View(note);
         }
 
-        // POST: Notes/Delete/5 (soft delete)
+        // POST: Notes/Delete/5 (Soft Delete)
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

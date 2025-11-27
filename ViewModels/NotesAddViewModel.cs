@@ -10,6 +10,6 @@ namespace KCRM.ViewModels
         public Notes Note { get; set; } = new Notes();
 
         // 2. Müşteri Seçimi için Liste
-        public IEnumerable<SelectListItem> CustomerList { get; set; }
+        public IEnumerable<SelectListItem>? CustomerList { get; set; }
     }
 }

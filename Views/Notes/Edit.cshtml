@@ -4,29 +4,66 @@
     Layout = "_LayoutPorto";
 }
 
-<h2>Not Düzenle</h2>
+<section role="main" class="content-body">
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
+    <header class="page-header mb-4">
+        <h2>@ViewData["Title"]</h2>
+    </header>
 
-    <div class="form-group">
-        <label>İçerik</label>
-        <textarea asp-for="Content" class="form-control"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
+    <div class="row">
+        <div class="col-lg-8">
+            @* Formu daha düzenli göstermek için 8 kolon kullanıyoruz *@
+
+            <section class="card card-modern">
+                @* Porto Admin Card Başlangıcı *@
+                <header class="card-header">
+                    <h4 class="card-title">Not Detayları</h4>
+                </header>
+                <div class="card-body">
+
+                    <form asp-action="Edit" method="post">
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <input type="hidden" asp-for="Id" />
+
+                        @* UserId, güvenlik gereği readonly kalmalı, ancak gizli alan kullanmak daha temizdir. *@
+                        <input type="hidden" asp-for="UserId" />
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">İçerik</label>
+                            <textarea asp-for="Content" class="form-control" rows="5"></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+
+                        @* Eğer yazarın (UserId) görünmesini istiyorsanız, readonly görünümünü kullanabilirsiniz: *@
+                        <div class="form-group mb-3">
+                            <label class="control-label">Yazar (ID)</label>
+                            <input asp-for="UserId" class="form-control" readonly />
+                            <span asp-validation-for="UserId" class="text-danger"></span>
+                        </div>
+
+                        @* NOT: CustomerId düzenleniyorsa buraya Customer seçimi de eklenmeli. *@
+
+                        <div class="form-group text-end mt-4">
+                            <button type="submit" class="btn btn-success">Güncelle</button>
+                            <a asp-action="Index" class="btn btn-warning me-2">Geri Dön</a>
+
+                        </div>
+
+                    </form>
+
+                </div>
+            </section>
+
+        </div>
     </div>
 
-    <div class="form-group mt-3">
-        <label>User ID</label>
-        <input asp-for="UserId" class="form-control" />
-        <span asp-validation-for="UserId" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary mt-3">Güncelle</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3">Geri Dön</a>
-</form>
+</section>
 
 @section Scripts {
     @{
+        // Form doğrulama scriptleri
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
