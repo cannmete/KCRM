@@ -14,7 +14,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
-        new MySqlServerVersion(new Version(9, 5, 0)) // senin MySQL sürümün
+        new MySqlServerVersion(new Version(9, 5, 0))
     ));
 builder.Services.AddAuthentication("Cookies")
     .AddCookie("Cookies", options =>
@@ -22,6 +22,8 @@ builder.Services.AddAuthentication("Cookies")
         options.LoginPath = "/Account/Login";
         options.LogoutPath = "/Account/Logout";
         options.AccessDeniedPath = "/Home/AccessDenied"; // yetkisiz eriþimde yönlendirme
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(60); // Oturum süresi
+        options.SlidingExpiration = true; // Ýþlem yaptýkça süreyi uzatma
     });
 
 

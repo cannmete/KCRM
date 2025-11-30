@@ -5,7 +5,6 @@
 }
 
 <section role="main" class="content-body">
-    @* Porto'nun ana içerik kapsayıcısı *@
 
     <header class="page-header d-flex justify-content-between align-items-center mb-3">
         <h2>Müşteriler</h2>
@@ -17,87 +16,74 @@
     <div class="modal fade" id="addCustomerModal" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-
                 <header class="card-header">
-                    @* Porto Admin Başlık Stili *@
                     <h2 class="card-title" id="addCustomerLabel">Yeni Müşteri Ekle</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </header>
-
                 <div class="card-body">
-                    @* Porto Admin İçerik Stili *@
                     @await Html.PartialAsync("_AddCustomerPartial", new KCRM.Models.Customer())
                 </div>
-
             </div>
         </div>
     </div>
 
-    <div class="row">
+    @if (!Model.Customers.Any())
+    {
+        <div class="alert alert-info">
+            Henüz hiç müşteri eklenmemiş. "Yeni Müşteri Ekle" butonu ile başlayabilirsiniz.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var c in Model.Customers)
+            {
+                <div class="col-xl-3 col-lg-4 col-md-6 col-12 mb-4">
 
-        <div class="col-lg-6">
-            <section class="card card-modern">
-                @* Ana Kapsayıcı Kart *@
-                <header class="card-header">
-                    <h4 class="card-title">Yeni Müşteriler</h4>
-                </header>
-                <div class="card-body">
-                    @foreach (var c in Model.Customers)
-                    {
-                        <div class="card card-modern card-border card-border-success mb-3">
-                            @* Bireysel Müşteri Kartı *@
-                            <div class="card-body">
-                                <h5 class="card-title">@c.FullName</h5>
-                                <p class="card-text text-muted"><strong>Email:</strong> @c.Email</p>
-                                <p class="card-text text-muted"><strong>Telefon:</strong> @c.Phone</p>
-                                <p class="card-text text-muted"><strong>Adres:</strong> @c.Address</p>
+                    <section class="card card-featured-left card-featured-primary h-100">
+                        <div class="card-body">
 
-                                <div class="mt-3">
-                                    <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-info">Detay</a>
-                                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Düzenle</a>
+                            <div class="widget-summary">
+                                <div class="widget-summary-col widget-summary-col-icon">
+                                    <div class="summary-icon bg-primary">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                </div>
+                                <div class="widget-summary-col">
+                                    <div class="summary">
+                                        <h4 class="title font-weight-bold">@c.FullName</h4>
+                                        <div class="info">
+                                            <span class="text-primary">Müşteri</span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    }
-                </div>
-            </section>
-        </div>
 
-        <div class="col-lg-6">
-            <section class="card card-modern">
-                @* Ana Kapsayıcı Kart *@
-                <header class="card-header">
-                    <h4 class="card-title">Potansiyel Müşteriler</h4>
-                </header>
-                <div class="card-body">
-                    @foreach (var c in Model.Leads)
-                    {
-                        <div class="card card-modern card-border card-border-warning mb-3">
-                            @* Bireysel Müşteri Kartı (Sınır Çizgisi Sarı) *@
-                            <div class="card-body">
-                                <h5 class="card-title">@c.FullName</h5>
-                                <p class="card-text text-muted"><strong>Email:</strong> @c.Email</p>
-                                <p class="card-text text-muted"><strong>Telefon:</strong> @c.Phone</p>
-                                <p class="card-text text-muted"><strong>Adres:</strong> @c.Address</p>
+                            <hr class="solid short mt-3 mb-3">
 
-
-                                <div class="mt-3">
-                                    <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-info">Detay</a>
-                                    <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning">Düzenle</a>
-                                </div>
+                            <div class="customer-info">
+                                <p class="mb-1"><i class="fas fa-envelope me-2 text-muted"></i> @(c.Email ?? "-")</p>
+                                <p class="mb-1"><i class="fas fa-phone me-2 text-muted"></i> @(c.Phone ?? "-")</p>
+                                <p class="mb-3 text-truncate" title="@c.Address"><i class="fas fa-map-marker-alt me-2 text-muted"></i> @(c.Address ?? "-")</p>
                             </div>
+
+                            <div class="d-flex justify-content-between mt-auto">
+                                <a asp-action="Details" asp-route-id="@c.Id" class="btn btn-sm btn-info w-50 me-1">Detay</a>
+                                <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-warning w-50 ms-1">Düzenle</a>
+                            </div>
+
                         </div>
-                    }
+                    </section>
+
                 </div>
-            </section>
+            }
         </div>
-    </div>
+    }
 
 </section>
 
 @section Scripts {
     @{
-        // Validasyon scriptleri Modal formunun doğru çalışması için buraya eklendi.
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }

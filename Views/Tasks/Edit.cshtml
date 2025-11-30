@@ -1,0 +1,91 @@
+﻿@model KCRM.Models.TaskItem
+@{
+    ViewData["Title"] = "Görevi Düzenle";
+    Layout = "_LayoutPorto";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>@ViewData["Title"]</h2>
+    </header>
+
+    <div class="row">
+        <div class="col-lg-8">
+
+            <section class="card card-modern">
+                <header class="card-header">
+                    <h2 class="card-title">Görev Detayları</h2>
+                </header>
+                <div class="card-body">
+
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="CreatedAt" />
+                        <input type="hidden" asp-for="CustomerId" />
+                        <input type="hidden" asp-for="LeadId" />
+
+                        <div class="form-group mb-3">
+                            <label class="control-label font-weight-bold">İlgili Kişi</label>
+                            @if (Model.Customer != null)
+                            {
+                                <input type="text" class="form-control" value="@Model.Customer.FullName (Müşteri)" disabled readonly />
+                            }
+                            else if (Model.Lead != null)
+                            {
+                                <input type="text" class="form-control" value="@Model.Lead.FullName (Aday)" disabled readonly />
+                            }
+                            else
+                            {
+                                <input type="text" class="form-control" value="Genel Görev" disabled readonly />
+                            }
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Başlık *</label>
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="control-label">Öncelik</label>
+                                <select asp-for="Priority" class="form-control" asp-items="Html.GetEnumSelectList<KCRM.Models.TaskPriority>()"></select>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="control-label">Durum</label>
+                                <select asp-for="Status" class="form-control" asp-items="Html.GetEnumSelectList<KCRM.Models.TaskStatus>()"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Bitiş Tarihi</label>
+                            <input asp-for="DueDate" type="date" class="form-control" />
+                            <span asp-validation-for="DueDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Açıklama</label>
+                            <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+                        </div>
+
+                        <div class="form-group text-end mt-4">
+                            <a asp-action="Index" class="btn btn-default me-2">İptal</a>
+                            <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,51 +1,33 @@
-﻿<!DOCTYPE html>
-<html lang="tr">
+﻿<!doctype html>
+<html class="fixed">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - KCRM</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: #e0f2ff; /* Açık mavi arka plan */
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] - KETCH STUDIO</title>
 
-        .card {
-            border-radius: 15px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800|Shadows+Into+Light" rel="stylesheet" type="text/css">
 
-            .card:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 20px 30px rgba(0,0,0,0.2);
-            }
+    <link rel="stylesheet" href="~/porto-admin/vendor/bootstrap/css/bootstrap.css" />
+    <link rel="stylesheet" href="~/porto-admin/vendor/font-awesome/css/all.min.css" />
+    <link rel="stylesheet" href="~/porto-admin/vendor/boxicons/css/boxicons.min.css" />
+    <link rel="stylesheet" href="~/porto-admin/css/theme.css" />
 
-        .btn-primary {
-            background-color: #0d6efd;
-            border: none;
-            transition: background-color 0.3s, transform 0.2s;
-        }
+    <link rel="stylesheet" href="~/porto-admin/css/skins/default.css" />
 
-            .btn-primary:hover {
-                background-color: #0b5ed7;
-                transform: scale(1.05);
-            }
+    <link rel="stylesheet" href="~/porto-admin/css/custom.css" />
 
-        .form-control:focus {
-            box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
-        }
-
-        a {
-            text-decoration: none;
-        }
-    </style>
+    <script src="~/porto-admin/vendor/modernizr/modernizr.js"></script>
 </head>
 <body>
-    @RenderBody()
-    @RenderSection("Scripts", required: false)
+    <section class="body-sign">
+        <div class="center-sign">
+            @RenderBody()
+        </div>
+    </section>
+    <script src="~/porto-admin/vendor/jquery/jquery.js"></script>
+    <script src="~/porto-admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/porto-admin/js/theme.js"></script>
+
+    @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -4,7 +4,9 @@
     ViewData["Title"] = "Kullanıcı Yönetimi";
 }
 
-<h1 class="h3 mb-4 text-gray-800">Kullanıcı Yönetimi</h1>
+<header class="page-header d-flex justify-content-between align-items-center mb-3">
+    <h2>Kullanıcı Yönetimi</h2>
+</header>
 
 <table class="table table-bordered">
     <thead>
@@ -28,7 +30,7 @@
                             <option value="User" selected="@(user.Role == "User")">User</option>
                             <option value="Admin" selected="@(user.Role == "Admin")">Admin</option>
                         </select>
-                        <button type="submit" class="btn btn-sm btn-primary">Kaydet</button>
+                        <button type="submit" class="btn btn-sm btn-success">Kaydet</button>
                     </form>
                 </td>
                 <td>

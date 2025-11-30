@@ -1,0 +1,151 @@
+﻿@model KCRM.Models.TaskItem
+@{
+    ViewData["Title"] = "Görev Detayı";
+    Layout = "_LayoutPorto";
+}
+
+<section role="main" class="content-body">
+
+    <header class="page-header mb-4">
+        <h2>@ViewData["Title"]</h2>
+    </header>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <section class="card card-modern">
+                <header class="card-header">
+                    <div class="card-actions">
+                        @if (Model.Status == KCRM.Models.TaskStatus.Tamamlandi)
+                        {
+                            <span class="badge badge-success" style="font-size: 1em;">TAMAMLANDI</span>
+                        }
+                        else if (Model.Status == KCRM.Models.TaskStatus.Iptal)
+                        {
+                            <span class="badge badge-dark" style="font-size: 1em;">İPTAL</span>
+                        }
+                        else if (Model.Status == KCRM.Models.TaskStatus.Islemde)
+                        {
+                            <span class="badge badge-primary" style="font-size: 1em;">İŞLEMDE</span>
+                        }
+                        else
+                        {
+                            <span class="badge badge-warning text-dark" style="font-size: 1em;">BEKLİYOR</span>
+                        }
+                    </div>
+                    <h4 class="card-title">Görev #@Model.Id</h4>
+                </header>
+
+                <div class="card-body">
+
+                    <div class="form-group mb-4">
+                        <h3 class="font-weight-bold text-dark mt-0 mb-2">@Model.Title</h3>
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            <p class="text-muted mb-0" style="white-space: pre-line;">@Model.Description</p>
+                        }
+                        else
+                        {
+                            <span class="text-muted font-italic">- Açıklama girilmemiş -</span>
+                        }
+                    </div>
+
+                    <hr class="dotted short">
+
+                    <div class="row">
+
+                        <div class="col-md-6 mb-3">
+                            <h5 class="font-weight-semibold text-dark mb-2">İlişkili Kişi</h5>
+
+                            @if (Model.Customer != null)
+                            {
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-primary text-white rounded-circle p-2 me-2">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block font-weight-bold">Müşteri</span>
+                                        <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId" class="text-primary">
+                                            @Model.Customer.FullName
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                            else if (Model.Lead != null)
+                            {
+                                <div class="d-flex align-items-center">
+                                    <div class="icon-box bg-warning text-white rounded-circle p-2 me-2">
+                                        <i class="fas fa-user-tag"></i>
+                                    </div>
+                                    <div>
+                                        <span class="d-block font-weight-bold">Aday (Lead)</span>
+                                        <a asp-controller="Leads" asp-action="Edit" asp-route-id="@Model.LeadId" class="text-warning text-dark-hover">
+                                            @Model.Lead.FullName
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Genel Görev (Bağlantı Yok)</span>
+                            }
+                        </div>
+
+                        <div class="col-md-6">
+                            <ul class="simple-bullet-list mb-0">
+                                <li class="mb-2">
+                                    <span class="title font-weight-bold">Öncelik:</span>
+                                    <span class="value">
+                                        @if (Model.Priority == KCRM.Models.TaskPriority.Acil)
+                                        {
+                                            <span class="text-danger font-weight-bold"><i class="fas fa-exclamation-circle"></i> ACİL</span>
+                                        }
+                                        else if (Model.Priority == KCRM.Models.TaskPriority.Yüksek)
+                                        {
+
+                                            <span class="text-warning font-weight-bold">Yüksek</span>
+                                        }
+                                        else if (Model.Priority == KCRM.Models.TaskPriority.Orta)
+                                        {
+
+                                            <span class="text-info">Orta</span>
+                                        }
+                                        else
+                                        {
+
+                                            <span class="text-muted">Düşük</span>
+                                        }
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="title font-weight-bold">Bitiş Tarihi:</span>
+                                    <span class="value @(Model.DueDate < DateTime.Now && Model.Status != KCRM.Models.TaskStatus.Tamamlandi ? "text-danger" : "")">
+                                        <i class="far fa-calendar-alt"></i> @Model.DueDate.ToShortDateString()
+                                    </span>
+                                </li>
+                                <li class="mb-2">
+                                    <span class="title font-weight-bold">Oluşturan:</span>
+                                    <span class="value">@(Model.User?.Username ?? "Sistem")</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+                <footer class="card-footer">
+                    <div class="row">
+                        <div class="col-md-12 text-end">
+                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2">
+                                <i class="fas fa-edit"></i> Düzenle
+                            </a>
+                            <a asp-action="Index" class="btn btn-default">Geri Dön</a>
+                        </div>
+                    </div>
+                </footer>
+
+            </section>
+
+        </div>
+    </div>
+
+</section>

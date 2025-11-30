@@ -5,7 +5,7 @@ namespace KCRM.ViewModels
 {
     public class CustomerIndexViewModel
     {
-        public List<Customer> Leads { get; set; } = new List<Customer>();
+        public List<Lead> Leads { get; set; } = new List<Lead>();
         public List<Customer> Customers { get; set; } = new List<Customer>();
     }
 }

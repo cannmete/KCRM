@@ -14,6 +14,7 @@ namespace KCRM.Data
 
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
         public DbSet<Notes> Notes { get; set; }
+        public DbSet<Lead> Leads { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -38,7 +39,6 @@ namespace KCRM.Data
                 entity.Property(e => e.Phone).HasColumnType("varchar(20)");
                 entity.Property(e => e.Address).HasColumnType("varchar(200)");
                 entity.Property(e => e.IsDeleted).HasColumnType("int").HasDefaultValue(0);
-                entity.Property(e => e.IsLead).HasColumnType("tinyint(1)").HasDefaultValue(true);
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             });
 
@@ -48,7 +48,6 @@ namespace KCRM.Data
                 entity.Property(e => e.Title).HasColumnType("varchar(100)").IsRequired();
                 entity.Property(e => e.Description).HasColumnType("varchar(300)");
                 entity.Property(e => e.IsDeleted).HasColumnType("int").HasDefaultValue(0);
-                entity.Property(e => e.IsCompleted).HasColumnType("tinyint(1)").HasDefaultValue(false);
                 entity.Property(e => e.DueDate).HasColumnType("datetime");
                 entity.Property(e => e.CreatedAt).HasColumnType("datetime");
             });

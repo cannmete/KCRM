@@ -107,10 +107,30 @@
                     @foreach (var customer in Model.Customers)
                     {
                         <tr>
-                            <td>@customer.FullName</td>
+                            <td>
+                                <a asp-controller="Customer" asp-action="Details" asp-route-id="@customer.Id" class="text-dark font-weight-bold">
+                                    @customer.FullName
+                                </a>
+                            </td>
                             <td>@customer.Email</td>
                             <td>@customer.Phone</td>
-                            <td>@(customer.Tasks?.Count ?? 0)</td>
+
+                            <td>
+                                @{
+                                    int taskCount = customer.Tasks?.Count ?? 0;
+                                }
+
+                                @if (taskCount > 0)
+                                {
+                                    <a asp-controller="Tasks" asp-action="Details" asp-route-id="@customer.Id" class="btn btn-xs btn-info text-white">
+                                        @taskCount <i class="fas fa-arrow-right ms-1" style="font-size: 0.8em;"></i>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">0</span>
+                                }
+                            </td>
                         </tr>
                     }
                 </tbody>

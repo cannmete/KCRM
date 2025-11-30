@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace KCRM.Controllers
 {
+    [Authorize]
     public class CustomerController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -21,14 +22,14 @@ namespace KCRM.Controllers
         // GET: Customer
         public async Task<IActionResult> Index()
         {
-            var leads = await _context.Customers
-                .Include(c => c.Tasks)
-                .Where(c => c.IsLead && c.IsDeleted == 0)
+            var leads = await _context.Leads
+                .Include(l => l.Tasks)
+                .Where(l => l.IsDeleted == 0)
                 .ToListAsync();
 
             var customers = await _context.Customers
                 .Include(c => c.Tasks)
-                .Where(c => !c.IsLead && c.IsDeleted == 0)
+                .Where(c => c.IsDeleted == 0)
                 .ToListAsync();
 
             var model = new CustomerIndexViewModel
@@ -64,7 +65,7 @@ namespace KCRM.Controllers
         // POST: Customer/Add
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add([Bind("FullName,Email,Phone,Address,UserId,IsLead")] Customer customer)
+        public async Task<IActionResult> Add([Bind("FullName,Email,Phone,Address,UserId")] Customer customer)
         {
             if (!ModelState.IsValid)
                 return View(customer);

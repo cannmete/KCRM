@@ -1,0 +1,200 @@
+﻿@model KCRM.ViewModels.UserProfileViewModel
+@{
+    ViewData["Title"] = "Profilim";
+    Layout = "_LayoutPorto";
+}
+
+<header class="page-header">
+    <h2>Kullanıcı Profili</h2>
+</header>
+
+<div class="row">
+
+    <div class="col-lg-4 col-xl-3 mb-4 mb-xl-0">
+
+        <section class="card">
+            <div class="card-body">
+                <div class="thumb-info mb-3">
+                    <img src="~/img/undraw_profile.svg" class="rounded img-fluid" alt="@Model.User.Username">
+                    <div class="thumb-info-title">
+                        <span class="thumb-info-inner">@Model.User.Username</span>
+                        <span class="thumb-info-type">@Model.Role</span>
+                    </div>
+                </div>
+
+                <div class="widget-toggle-expand mb-3">
+                    <div class="widget-header">
+                        <h5 class="mb-2 font-weight-semibold text-dark">İletişim Bilgileri</h5>
+                        <div class="widget-toggle">+</div>
+                    </div>
+                    <div class="widget-content-expanded">
+                        <ul class="simple-todo-list mt-3">
+                            <li class="completed">E-posta: <span class="text-primary">@Model.User.Email</span></li>
+                            @* İleride Telefon vb. eklenirse buraya gelir *@
+                        </ul>
+                    </div>
+                </div>
+
+                <hr class="dotted short">
+
+                <h5 class="mb-2 font-weight-semibold text-dark">Hakkında</h5>
+                @if (User.IsInRole("Admin"))
+                {
+                    <p class="text-muted">
+                        Tam yetkili sistem yöneticisi.
+                    </p>
+                }
+                else
+                {
+                    
+                    <p class="text-muted">
+                        KCRM operasyonel kullanıcısı.
+                    </p>
+                }
+
+                
+
+            </div>
+        </section>
+
+    </div>
+
+    <div class="col-lg-8 col-xl-9">
+
+        <div class="row mb-3">
+
+            <div class="col-xl-4 col-md-4 col-12 mb-3">
+                <section class="card card-featured-left card-featured-primary mb-3">
+                    <div class="card-body">
+                        <div class="widget-summary">
+                            <div class="widget-summary-col widget-summary-col-icon">
+                                <div class="summary-icon bg-primary">
+                                    <i class="fas fa-sticky-note"></i>
+                                </div>
+                            </div>
+                            <div class="widget-summary-col">
+                                <div class="summary">
+                                    <h4 class="title">Notlarım</h4>
+                                    <div class="info">
+                                        <strong class="amount">@Model.TotalNotesCount</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-xl-4 col-md-4 col-12 mb-3">
+                <section class="card card-featured-left card-featured-success mb-3">
+                    <div class="card-body">
+                        <div class="widget-summary">
+                            <div class="widget-summary-col widget-summary-col-icon">
+                                <div class="summary-icon bg-success">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                            </div>
+                            <div class="widget-summary-col">
+                                <div class="summary">
+                                    <h4 class="title">Görevlerim</h4>
+                                    <div class="info">
+                                        <strong class="amount">@Model.TotalTasksCount</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="col-xl-4 col-md-4 col-12 mb-3">
+                <section class="card card-featured-left card-featured-warning mb-3">
+                    <div class="card-body">
+                        <div class="widget-summary">
+                            <div class="widget-summary-col widget-summary-col-icon">
+                                <div class="summary-icon bg-warning">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="widget-summary-col">
+                                <div class="summary">
+                                    <h4 class="title">Bekleyen</h4>
+                                    <div class="info">
+                                        <strong class="amount">@Model.PendingTasksCount</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+
+        <section class="card card-modern">
+    <header class="card-header">
+        <h2 class="card-title">Son Eklenen Görevler</h2>
+    </header>
+    <div class="card-body">
+        @if (Model.RecentTasks.Any())
+        {
+            <table class="table table-responsive-md table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Başlık</th>
+                        <th>İlgili Kişi</th> @* Kolon başlığı değiştirildi *@
+                        <th>Durum</th>
+                        <th>Tarih</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var task in Model.RecentTasks)
+                    {
+                        <tr>
+                            <td>@task.Title</td>
+                            <td>
+                                @{
+                                    // Müşteri (Customer) kontrolü
+                                    if (task.Customer != null)
+                                    {
+                                        <i class="fas fa-user text-primary me-1"></i>
+                                        <a asp-controller="Customer" asp-action="Details" asp-route-id="@task.CustomerId">
+                                            @task.Customer.FullName
+                                        </a>
+                                        <span class="badge bg-primary ms-1">Müşteri</span>
+                                    }
+                                    // Lead (Potansiyel Müşteri) kontrolü
+                                    else if (task.Lead != null)
+                                    {
+                                        <i class="fas fa-user-tag text-warning me-1"></i>
+                                        <a asp-controller="Leads" asp-action="Details" asp-route-id="@task.LeadId">
+                                            @task.Lead.FullName</a>
+                                        <span class="badge bg-warning ms-1">Lead</span>
+                                    }
+                                    // Hiçbiri atanmamışsa
+                                    else
+                                    {
+                                        <span class="text-muted">- Atanmamış -</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                <span class="badge @(task.Status == KCRM.Models.TaskStatus.Bekliyor ? "bg-warning" : "bg-success")">
+                                    @task.Status
+                                </span>
+                            </td>
+                            <td>@task.CreatedAt.ToShortDateString()</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="alert alert-info">Henüz bir görev kaydınız bulunmuyor.</div>
+        }
+    </div>
+</section>
+
+    </div>
+</div>

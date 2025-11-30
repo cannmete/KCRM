@@ -42,7 +42,7 @@
                         </figure>
                         <span class="profile-info">
                             <span class="name">@User.Identity.Name</span>
-                            <span class="role">Admin</span>
+                            <span class="role">@(User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value ?? "Kullanıcı")</span>
                         </span>
                     </a>
 
@@ -77,15 +77,45 @@
                     <div class="nano-content">
                         <nav class="nav-main">
                             <ul class="nav nav-main">
-                                <li><a asp-controller="Home" asp-action="Index"><i class="fas fa-home"></i><span>Dashboard</span></a></li>
-                                <li><a asp-controller="Customer" asp-action="Index"><i class="fas fa-users"></i><span>Müşteriler</span></a></li>
+                                <li>
+                                    <a asp-controller="Home" asp-action="Index">
+                                        <i class="fas fa-home"></i><span>Dashboard</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Customer" asp-action="Index">
+                                        <i class="fas fa-users"></i><span>Müşteriler</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Leads" asp-action="Index">
+
+                                        <i class="fas fa-user-tag" aria-hidden="true"></i><span>Leads</span>
+                                    </a>
+                                </li>
                                 @if (User.IsInRole("Admin"))
                                 {
-                                    <li><a asp-controller="Admin" asp-action="UserList"><i class="fas fa-user-shield"></i><span>Kullanıcı Yönetimi</span></a></li>
+                                    <li>
+                                        <a asp-controller="Admin" asp-action="UserList">
+                                            <i class="fas fa-user-shield"></i><span>Kullanıcı Yönetimi</span>
+                                        </a>
+                                    </li>
                                 }
-                                <li><a asp-controller="Notes" asp-action="Index"><i class="fas fa-sticky-note"></i><span>Notlar</span></a></li>
-                                <li><a asp-controller="Tasks" asp-action="Index"><i class="fas fa-tasks"></i><span>Görevler</span></a></li>
-                                <li><a asp-controller="Settings" asp-action="Index"><i class="fas fa-cog"></i><span>Ayarlar</span></a></li>
+                                <li>
+                                    <a asp-controller="Notes" asp-action="Index">
+                                        <i class="fas fa-sticky-note"></i><span>Notlar</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Tasks" asp-action="Index">
+                                        <i class="fas fa-tasks"></i><span>Görevler</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a asp-controller="Settings" asp-action="Index">
+                                        <i class="fas fa-cog"></i><span>Ayarlar</span>
+                                    </a>
+                                </li>
                             </ul>
                         </nav>
                     </div>
@@ -100,7 +130,7 @@
 
 
         <footer class="footer text-center py-3">
-            <span>&copy; @DateTime.Now.Year Can METE</span>
+            <span>&copy; @DateTime.Now.Year KETCH STUDIO | Tüm hakları saklıdır.</span>
         </footer>
 
     </section> @* body section sonu *@
@@ -110,14 +140,16 @@
     <script src="~/porto-admin/vendor/popper/umd/popper.min.js"></script>
     <script src="~/porto-admin/vendor/jquery-browser-mobile/jquery.browser.mobile.js"></script>
 
-    <script src="~/porto-admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script> @* bundle, popper'ı içerir ama emin olmak için ikisini de tutuyoruz *@
+    <script src="~/porto-admin/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <script src="~/porto-admin/vendor/nanoscroller/nanoscroller.js"></script>
     <script src="~/porto-admin/vendor/magnific-popup/jquery.magnific-popup.js"></script>
 
-    <script src="~/porto-admin/js/theme.js"></script> @* theme.init.js içeriği buraya yapıştırılmış olmalı *@
+    <script src="~/porto-admin/js/theme.js"></script>
     <script src="~/porto-admin/js/custom.js"></script>
-    <script src="~/porto-admin/js/theme.init.js"></script>
+
+    @* DÜZELTME: theme.init.js kaldırıldı (theme.js içinde olduğu için) *@
+    @* <script src="~/porto-admin/js/theme.init.js"></script> *@
 
 
     @await RenderSectionAsync("Scripts", required: false)

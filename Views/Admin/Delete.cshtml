@@ -1,0 +1,23 @@
+﻿@model KCRM.Models.User
+@{
+    ViewData["Title"] = "Notu Sil";
+    Layout = "_LayoutPorto";
+}
+
+<h2>Notu Sil</h2>
+
+<div class="alert alert-danger">
+    <p><strong>Bu notu silmek istediğine emin misin?</strong></p>
+</div>
+
+<div class="card p-3 mb-3">
+    <p><strong>Id:</strong> @Model.</p>
+    <p><strong>İçerik:</strong> @Model.</p>
+    <p><strong>User ID:</strong> @Model.</p>
+</div>
+
+<form asp-action="Delete">
+    <input type="hidden" asp-for="Id"/>
+    <button type="submit" class="btn btn-danger">Sil</button>
+    <a asp-action="Index" class="btn btn-secondary">İptal</a>
+</form>

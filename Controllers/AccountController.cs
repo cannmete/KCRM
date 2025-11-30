@@ -3,6 +3,7 @@ using KCRM.Models;
 using KCRM.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -120,6 +121,49 @@ namespace KCRM.Controllers
             using var hmac = new HMACSHA512(storedSalt);
             var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(password));
             return computedHash.SequenceEqual(storedHash);
+        }
+        // GET: Account/Profile
+        public async Task<IActionResult> Profile()
+        {
+            // 1. Giriş yapan kullanıcının ID'sini al
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+
+            // 2. Kullanıcıyı bul
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            // 3. İstatistikleri Hesapla (Sadece BU kullanıcıya ait veriler)
+            int noteCount = await _context.Notes
+                .CountAsync(n => n.UserId == userId && n.IsDeleted == 0);
+
+            int taskCount = await _context.Tasks // Veya _context.Tasks
+                .CountAsync(t => t.UserId == userId && t.IsDeleted == 0);
+
+            int pendingTaskCount = await _context.Tasks
+                .CountAsync(t => t.UserId == userId && t.Status == Models.TaskStatus.Bekliyor && t.IsDeleted == 0);
+
+            // 4. Son Görevleri Çek (Örn: Son 5 görev)
+            var recentTasks = await _context.Tasks // Veya _context.Tasks
+                .Where(t => t.UserId == userId && t.IsDeleted == 0)
+                .OrderByDescending(t => t.CreatedAt)
+                .Take(5)
+                .Include(t => t.Customer) // Müşteri ismini göstermek için
+                .Include(t => t.Lead) // Lead verilerini çekmek için
+                .ToListAsync();
+
+            // 5. ViewModel'i Doldur
+            var model = new UserProfileViewModel
+            {
+                User = user,
+                Role = userRole,
+                TotalNotesCount = noteCount,
+                TotalTasksCount = taskCount,
+                PendingTasksCount = pendingTaskCount,
+                RecentTasks = recentTasks
+            };
+
+            return View(model);
         }
     }
 }

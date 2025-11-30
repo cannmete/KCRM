@@ -1,6 +1,7 @@
 ﻿using KCRM.Data;
 using KCRM.Models;
 using KCRM.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace KCRM.Controllers
 {
+    [Authorize]
     public class NotesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -126,6 +128,9 @@ namespace KCRM.Controllers
             if (id != incoming.Id) return NotFound();
 
             var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ModelState.Remove("User");
+            ModelState.Remove("Customer");
+            ModelState.Remove("Lead");
 
             if (!ModelState.IsValid) return View(incoming);
 

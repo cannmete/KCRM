@@ -12,8 +12,10 @@ namespace KCRM.Models
         [Required]
         public int UserId { get; set;   }
         public User User { get; set; } = null!; // Nullable olamaz.
-        public int? CustomerId { get; set; } // Müşteri ID'sini saklamak için
-        public Customer? Customer { get; set; } // Müşteri nesnesine navigasyon için
-        public int IsDeleted { get; set; }
+        public int? CustomerId { get; set; } // Müşteri ID'sini saklamak için.
+        public Customer? Customer { get; set; } // Müşteri nesnesine navigasyon için.
+        public int? LeadId { get; set; } // Lead ID'sini saklamak için.
+        public Lead? Lead { get; set; } //Lead nesnesine navigasyon için.
+        public int IsDeleted { get; set; } // Yumuşak silme için.
     }
 }
