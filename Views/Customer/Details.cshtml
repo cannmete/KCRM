@@ -1,0 +1,125 @@
+﻿@model KCRM.Models.Customer
+@{
+    ViewData["Title"] = "Müşteri Detayı";
+    Layout = "_LayoutPorto";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header mb-3">
+        <h2>@Model.FullName</h2>
+    </header>
+
+    <div class="row">
+        <div class="col-lg-4 col-xl-3 mb-4 mb-xl-0">
+            <section class="card">
+                <div class="card-body">
+                    <div class="thumb-info mb-3">
+                        <div class="thumb-info-title">
+                            <span class="thumb-info-inner">@Model.FullName</span>
+                            <span class="thumb-info-type">Müşteri</span>
+                        </div>
+                    </div>
+
+                    <div class="widget-toggle-expand mb-3">
+                        <div class="widget-header">
+                            <h5 class="mb-2 font-weight-semibold text-dark">İletişim</h5>
+                        </div>
+                        <ul class="simple-todo-list mt-3">
+                            <li class="completed">Email: <span class="text-primary">@(Model.Email ?? "-")</span></li>
+                            <li class="completed">Tel: <span class="text-primary">@(Model.Phone ?? "-")</span></li>
+                            <li class="completed">Adres: <span class="text-muted">@(Model.Address ?? "-")</span></li>
+                        </ul>
+                    </div>
+
+                    <hr class="dotted short">
+
+                    <div class="text-center">
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning w-100 mb-2">Düzenle</a>
+                        <a asp-action="Index" class="btn btn-default w-100">Listeye Dön</a>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-lg-8 col-xl-9">
+
+            <section class="card card-modern mb-4">
+                <header class="card-header">
+                    <h2 class="card-title">İlgili Görevler</h2>
+                </header>
+                <div class="card-body">
+                    @if (Model.Tasks != null && Model.Tasks.Any())
+                    {
+                        <table class="table table-responsive-md table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Görev</th>
+                                    <th>Durum</th>
+                                    <th>Öncelik</th>
+                                    <th>Bitiş Tarihi</th>
+                                    <th>İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var task in Model.Tasks.OrderByDescending(t => t.CreatedAt))
+                                {
+                                    <tr>
+                                        <td>@task.Title</td>
+                                        <td>@task.Status</td>
+                                        <td>@task.Priority</td>
+                                        <td>@task.DueDate.ToShortDateString()</td>
+                                        <td>
+                                            <a asp-controller="Tasks" asp-action="Details" asp-route-id="@task.Id" class="text-info"><i class="fas fa-eye"></i></a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">Bu müşteriye ait açık görev bulunmuyor.</div>
+                    }
+                </div>
+            </section>
+
+            <section class="card card-modern">
+                <header class="card-header">
+                    <h2 class="card-title">Not Geçmişi</h2>
+                </header>
+                <div class="card-body">
+                    @if (Model.Notes != null && Model.Notes.Any())
+                    {
+                        <div class="timeline timeline-simple mt-3 mb-3">
+                            <div class="tm-body">
+                                @foreach (var note in Model.Notes.OrderByDescending(n => n.Id))
+                                {
+                                    <div class="tm-title">
+                                        <h5 class="m-0 pt-2 pb-2 text-uppercase">Yazar: @(note.User?.Username ?? "Sistem")</h5>
+                                    </div>
+                                    <ol class="tm-items">
+                                        <li>
+                                            <div class="tm-box">
+                                                <p>@note.Content</p>
+                                                <div class="tm-meta">
+                                                    <span>
+                                                        <i class="fas fa-tag"></i> Not ID: @note.Id
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ol>
+                                }
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info mb-0">Henüz not eklenmemiş.</div>
+                    }
+                </div>
+            </section>
+
+        </div>
+    </div>
+</section>

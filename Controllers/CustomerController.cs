@@ -48,12 +48,16 @@ namespace KCRM.Controllers
 
             var customer = await _context.Customers
                 .Include(c => c.Tasks)
+                  .ThenInclude(t => t.User)
+                .Include(c => c.Notes)
+                  .ThenInclude(n => n.User)
                 .FirstOrDefaultAsync(c => c.Id == id && c.IsDeleted == 0);
 
             if (customer == null) return NotFound();
 
             return View(customer);
         }
+
 
         // GET: Customer/Add
         [Authorize(Roles = "Admin")]
@@ -89,7 +93,9 @@ namespace KCRM.Controllers
         {
             if (id == null) return NotFound();
 
+            // Sadece ID'ye göre çekiyoruz, ilişkileri (Include) getirmeye gerek yok çünkü düzenleme formunda sadece temel bilgiler var.
             var customer = await _context.Customers.FindAsync(id);
+
             if (customer == null || customer.IsDeleted == 1) return NotFound();
 
             return View(customer);
@@ -99,22 +105,48 @@ namespace KCRM.Controllers
         [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Phone,Address,UserId")] Customer incoming)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Phone,Address")] Customer incoming)
         {
+            // 1. ID Kontrolü
             if (id != incoming.Id) return NotFound();
+
+            // 2. Validasyon Temizliği (User ve UserId formdan gelmediği için hata vermesini engelle)
+            ModelState.Remove("User");
+            ModelState.Remove("UserId");
+
             if (!ModelState.IsValid) return View(incoming);
 
-            var existing = await _context.Customers.FindAsync(id);
-            if (existing == null || existing.IsDeleted == 1) return NotFound();
+            try
+            {
+                // 3. Mevcut Veriyi Çek (Takip Edilen Entity)
+                var existing = await _context.Customers.FindAsync(id);
 
-            existing.FullName = incoming.FullName;
-            existing.Email = incoming.Email;
-            existing.Phone = incoming.Phone;
-            existing.Address = incoming.Address;
-            existing.UserId = incoming.UserId;
+                if (existing == null || existing.IsDeleted == 1) return NotFound();
 
-            _context.Update(existing);
-            await _context.SaveChangesAsync();
+                // 4. Sadece İzin Verilen Alanları Güncelle
+                // UserId ve CreatedAt alanlarına DOKUNMUYORUZ. Böylece veri korunuyor.
+                existing.FullName = incoming.FullName;
+                existing.Email = incoming.Email;
+                existing.Phone = incoming.Phone;
+                existing.Address = incoming.Address;
+
+                // Not: _context.Update(existing) demeye gerek yok, 
+                // çünkü 'existing' veritabanından çekildiği için zaten takip ediliyor (Tracked).
+                // SaveChanges yapınca değişiklikleri otomatik algılar.
+
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await _context.Customers.AnyAsync(e => e.Id == id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
 
             return RedirectToAction(nameof(Index));
         }

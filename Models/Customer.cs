@@ -29,5 +29,6 @@ namespace KCRM.Models
         public User? User { get; set; }
 
         public ICollection<TaskItem>? Tasks { get; set; }
+        public ICollection<Notes>? Notes { get; set; }
     }
 }

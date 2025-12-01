@@ -72,12 +72,11 @@ namespace KCRM.Controllers
         // POST: Leads/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Lead lead)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,FullName,Email,Phone,Address,CompanyName,Source")] Lead lead)
         {
             if (id != lead.Id) return NotFound();
 
-            // UserId formdan gelmiyor, mevcut kayıttan korumalıyız veya tekrar atamalıyız.
-            // Bu örnekte validasyonu geçmek için remove yapıyoruz.
+            // UserId ve CreatedAt formdan gelmez, validasyondan çıkarıyoruz.
             ModelState.Remove("User");
             ModelState.Remove("UserId");
 
@@ -85,15 +84,21 @@ namespace KCRM.Controllers
 
             try
             {
-                var existing = await _context.Leads.AsNoTracking().FirstOrDefaultAsync(l => l.Id == id);
-                if (existing == null) return NotFound();
+                // 1. Mevcut veriyi çek
+                var existing = await _context.Leads.FindAsync(id);
+                if (existing == null || existing.IsDeleted == 1) return NotFound();
 
-                // Değişmemesi gereken alanları koru
-                lead.UserId = existing.UserId;
-                lead.CreatedAt = existing.CreatedAt;
-                lead.IsDeleted = 0;
+                // 2. Alanları güncelle (UserId ve CreatedAt KORUNUR)
+                existing.FullName = lead.FullName;
+                existing.Email = lead.Email;
+                existing.Phone = lead.Phone;
+                existing.Address = lead.Address;
 
-                _context.Update(lead);
+                // Lead'e özel alanlar:
+                existing.CompanyName = lead.CompanyName;
+                existing.Source = lead.Source;
+
+                // 3. Kaydet
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -101,9 +106,8 @@ namespace KCRM.Controllers
                 if (!await _context.Leads.AnyAsync(e => e.Id == lead.Id)) return NotFound();
                 throw;
             }
+
             return RedirectToAction(nameof(Index));
         }
-
-        // Silme ve Detay işlemleriCustomerController ile aynı mantıkta eklenebilir.
     }
 }

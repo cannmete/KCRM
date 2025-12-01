@@ -1,0 +1,89 @@
+﻿@model KCRM.Models.Lead
+@{
+    ViewData["Title"] = "Adayı Düzenle";
+    Layout = "_LayoutPorto";
+}
+
+<section role="main" class="content-body">
+    <header class="page-header">
+        <h2>Aday Düzenle</h2>
+    </header>
+
+    <div class="row">
+        <div class="col-lg-8">
+
+            <section class="card card-modern">
+                <header class="card-header">
+                    <h2 class="card-title">Aday Bilgileri</h2>
+                </header>
+                <div class="card-body">
+
+                    <form asp-action="Edit" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="UserId" />
+                        <input type="hidden" asp-for="CreatedAt" />
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Ad Soyad *</label>
+                            <input asp-for="FullName" class="form-control" />
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="control-label">Şirket Adı</label>
+                                <input asp-for="CompanyName" class="form-control" placeholder="Örn: ABC Ltd." />
+                                <span asp-validation-for="CompanyName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="control-label">Kaynak</label>
+                                <select asp-for="Source" class="form-control">
+                                    <option value="">Seçiniz...</option>
+                                    <option value="Linkedin">Linkedin</option>
+                                    <option value="Referans">Referans</option>
+                                    <option value="Web Sitesi">Web Sitesi</option>
+                                    <option value="Google">Google Ads</option>
+                                    <option value="Diğer">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="control-label">Email</label>
+                                <input asp-for="Email" class="form-control" />
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 form-group mb-3">
+                                <label class="control-label">Telefon</label>
+                                <input asp-for="Phone" class="form-control" />
+                                <span asp-validation-for="Phone" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label class="control-label">Adres</label>
+                            <textarea asp-for="Address" class="form-control" rows="3"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group text-end mt-4">
+                            <a asp-action="Index" class="btn btn-default me-2">İptal</a>
+                            <button type="submit" class="btn btn-primary">Değişiklikleri Kaydet</button>
+                        </div>
+
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
