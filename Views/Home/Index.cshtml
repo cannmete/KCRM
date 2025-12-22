@@ -9,7 +9,6 @@
 </header>
 
 <div class="row">
-
     <div class="col-xl-4 col-md-6 mb-4">
         <section class="card card-featured card-featured-primary">
             <div class="card-body">
@@ -84,13 +83,41 @@
             </div>
         </section>
     </div>
-
 </div>
 
+<div class="row mb-4">
+    <div class="col-lg-6 mb-4 mb-lg-0">
+        <section class="card h-100">
+            <header class="card-header">
+                <h2 class="card-title">Aylık Müşteri Kayıtları</h2>
+                <p class="card-subtitle">Son 6 aydaki müşteri artış grafiği</p>
+            </header>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height:300px; width:100%">
+                    <canvas id="customerChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-lg-6">
+        <section class="card h-100">
+            <header class="card-header">
+                <h2 class="card-title">Görev Durum Dağılımı</h2>
+                <p class="card-subtitle">Görevlerin statülerine göre dağılımı</p>
+            </header>
+            <div class="card-body">
+                <div class="chart-container" style="position: relative; height:300px; width:100%">
+                    <canvas id="taskChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
 
 <section class="card card-modern">
     <header class="card-header">
-        <h4 class="card-title">Müşteriler</h4>
+        <h4 class="card-title">Son Eklenen Müşteriler</h4>
     </header>
     <div class="card-body">
         <div class="table-responsive">
@@ -100,7 +127,7 @@
                         <th>Ad</th>
                         <th>Email</th>
                         <th>Telefon</th>
-                        <th>Görev Sayısı</th>
+                        <th>Görevler</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -114,21 +141,19 @@
                             </td>
                             <td>@customer.Email</td>
                             <td>@customer.Phone</td>
-
                             <td>
                                 @{
                                     int taskCount = customer.Tasks?.Count ?? 0;
                                 }
-
                                 @if (taskCount > 0)
                                 {
-                                    <a asp-controller="Tasks" asp-action="Details" asp-route-id="@customer.Id" class="btn btn-xs btn-info text-white">
-                                        @taskCount <i class="fas fa-arrow-right ms-1" style="font-size: 0.8em;"></i>
-                                    </a>
+                                    <span class="badge badge-info" style="font-size: 0.9em;">
+                                        @taskCount Görev
+                                    </span>
                                 }
                                 else
                                 {
-                                    <span class="text-muted">0</span>
+                                    <span class="text-muted">-</span>
                                 }
                             </td>
                         </tr>
@@ -138,3 +163,82 @@
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // --- VERİLERİN ALINMASI ---
+            var customerLabels = @Html.Raw(Json.Serialize(Model.CustomerGraphLabels));
+            var customerValues = @Html.Raw(Json.Serialize(Model.CustomerGraphValues));
+
+            var taskLabels = @Html.Raw(Json.Serialize(Model.TaskStatusLabels));
+            var taskValues = @Html.Raw(Json.Serialize(Model.TaskStatusValues));
+
+            // --- 1. GRAFİK: MÜŞTERİ (LINE CHART) ---
+            var ctx1 = document.getElementById('customerChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: customerLabels,
+                    datasets: [{
+                        label: 'Yeni Müşteri',
+                        data: customerValues,
+                        borderColor: '#0088cc', // Porto Mavi
+                        backgroundColor: 'rgba(0, 136, 204, 0.2)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4, // Kıvrımlı çizgi
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false } // Tek veri olduğu için lejantı gizle
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { stepSize: 1 } // Tam sayı göster
+                        }
+                    }
+                }
+            });
+
+            // --- 2. GRAFİK: GÖREVLER (DOUGHNUT CHART) ---
+            var ctx2 = document.getElementById('taskChart').getContext('2d');
+
+            // Renk Paleti (Porto Teması Uyumlu)
+            var colors = ['#28a745', '#ffc107', '#dc3545', '#17a2b8', '#6c757d'];
+
+            new Chart(ctx2, {
+                type: 'doughnut',
+                data: {
+                    labels: taskLabels,
+                    datasets: [{
+                        data: taskValues,
+                        backgroundColor: colors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

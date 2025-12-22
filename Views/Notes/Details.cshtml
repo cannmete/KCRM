@@ -58,27 +58,6 @@
                 </div>
             </section>
 
-            <section class="card card-modern card-border card-border-danger mt-4">
-                <div class="card-body">
-
-                    <h5 class="text-danger">Uyarı: Bu Notu Silmek Üzeresiniz</h5>
-                    <p>Bu işlem kalıcıdır (IsDeleted = 1 olarak işaretlenecektir). Onaylıyor musunuz?</p>
-
-                    <div class="d-flex justify-content-between mt-3">
-
-                        <div>
-                            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning me-2"><i class="fas fa-edit"></i> Düzenle</a>
-                            <a asp-action="Index" class="btn btn-default">Geri Dön</a>
-                        </div>
-
-                        <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
-                            <button type="submit" class="btn btn-danger"><i class="fas fa-trash"></i> Silmeyi Onayla</button>
-                        </form>
-                    </div>
-
-                </div>
-            </section>
-
         </div>
     </div>
 

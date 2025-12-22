@@ -109,5 +109,102 @@ namespace KCRM.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        // POST: Leads/Convert/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConvertToCustomer(int id)
+        {
+            // 1. Transaction Başlat (Hata olursa yarım kalmasın diye)
+            using var transaction = _context.Database.BeginTransaction();
+
+            try
+            {
+                // 2. Lead'i ilişkileriyle beraber çek (Tasks ve Notes önemli)
+                var lead = await _context.Leads
+                    .Include(l => l.Tasks)
+                    .Include(l => l.Notes)
+                    .FirstOrDefaultAsync(l => l.Id == id);
+
+                if (lead == null || lead.IsDeleted == 1)
+                {
+                    return NotFound();
+                }
+
+                // 3. Yeni Müşteri Nesnesi Oluştur
+                var newCustomer = new Customer
+                {
+                    FullName = lead.FullName,
+                    Email = lead.Email,
+                    Phone = lead.Phone,
+                    // Customer'da Adres zorunlu, Lead'de boşsa placeholder koyuyoruz
+                    Address = string.IsNullOrEmpty(lead.Address) ? "Adres girilmedi (Adaydan dönüştürüldü)" : lead.Address,
+                    UserId = lead.UserId, // Aday kiminse müşteri de onun olsun
+                    CreatedAt = DateTime.UtcNow,
+                    IsDeleted = 0,
+                    Notes = new List<Notes>() // Not listesini başlat
+                };
+
+                // 4. Müşteriyi Ekle ve Kaydet (ID oluşması için)
+                _context.Customers.Add(newCustomer);
+                await _context.SaveChangesAsync();
+
+                // 5. Lead'e ait Görevleri Müşteriye Taşı
+                if (lead.Tasks != null)
+                {
+                    foreach (var task in lead.Tasks)
+                    {
+                        task.CustomerId = newCustomer.Id; // Müşteriye bağla
+                        task.LeadId = null;               // Lead bağlantısını kopar
+                        _context.Entry(task).State = EntityState.Modified;
+                    }
+                }
+
+                // 6. Lead'e ait Notları Müşteriye Taşı
+                if (lead.Notes != null)
+                {
+                    foreach (var note in lead.Notes)
+                    {
+                        note.CustomerId = newCustomer.Id;
+                        note.LeadId = null;
+                        _context.Entry(note).State = EntityState.Modified;
+                    }
+                }
+
+                // 7. Lead Bilgilerini (Şirket, Kaynak) Kaybetmemek için Not Olarak Ekle
+                var conversionNoteContent = $"Bu müşteri Aday listesinden dönüştürüldü.\n" +
+                                            $"Eski Şirket Adı: {lead.CompanyName ?? "-"}\n" +
+                                            $"Kaynak: {lead.Source ?? "-"}";
+
+                var infoNote = new Notes
+                {
+                    Content = conversionNoteContent,
+                    CustomerId = newCustomer.Id,
+                    UserId = lead.UserId, // İşlemi yapan veya sahibi
+                    IsDeleted = 0
+                };
+                _context.Notes.Add(infoNote);
+
+                // 8. Lead'i Silinmiş İşaretle (Soft Delete)
+                lead.IsDeleted = 1;
+                _context.Leads.Update(lead);
+
+                // Tüm değişiklikleri veritabanına uygula
+                await _context.SaveChangesAsync();
+
+                // İşlemi onayla
+                await transaction.CommitAsync();
+
+                // Başarılı olunca yeni müşterinin detayına git
+                return RedirectToAction("Details", "Customer", new { id = newCustomer.Id });
+            }
+            catch (Exception ex)
+            {
+                // Hata olursa her şeyi geri al
+                await transaction.RollbackAsync();
+                // Hatayı loglayabilir veya kullanıcıya gösterebilirsin
+                return BadRequest("Dönüştürme işlemi sırasında bir hata oluştu: " + ex.Message);
+            }
+        }
     }
 }

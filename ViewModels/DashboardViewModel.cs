@@ -11,6 +11,11 @@ namespace KCRM.ViewModels
         public List<Notes> Notes { get; set; } = new List<Notes>();
 
 
+        public List<string> CustomerGraphLabels { get; set; } = new List<string>();
+        public List<int> CustomerGraphValues { get; set; } = new List<int>();
+
+        public List<string> TaskStatusLabels { get; set; } = new List<string>();
+        public List<int> TaskStatusValues { get; set; } = new List<int>();
     }
 
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace KCRM.Controllers
 {
@@ -53,19 +54,44 @@ namespace KCRM.Controllers
                 .OrderByDescending(c => c.CreatedAt) // (Opsiyonel) En yeniler üstte görünsün
                 .ToListAsync();
 
+            // --- 3. ADIM: GRAFÝK VERÝLERÝNÝ HAZIRLA (YENÝ) ---
 
-            // 3. ADIM: VIEWMODEL OLUÞTUR
+            // A) Son 6 Ayda Eklenen Müþteriler (Line Chart)
+            // Veritabanýndan tarihleri çekip RAM'de grupluyoruz (EF Core sürümüne göre deðiþebilir, bu en güvenli yöntem)
+            var customerData = await _context.Customers
+                .Where(c => c.IsDeleted == 0 && c.CreatedAt >= DateTime.Now.AddMonths(-6))
+                .OrderBy(c => c.CreatedAt)
+                .Select(c => c.CreatedAt)
+                .ToListAsync();
+
+            var groupedCustomers = customerData
+                .GroupBy(x => x.ToString("MMMM", new CultureInfo("tr-TR"))) // Ay ismine göre grupla
+                .Select(g => new { Month = g.Key, Count = g.Count() })
+                .ToList();
+
+            // B) Görev Durum Daðýlýmý (Doughnut Chart)
+            // Task modelinde "Status" adýnda bir string veya enum olduðunu varsayýyorum.
+            // Eðer yoksa burayý kendi kolon adýna göre güncellemelisin.
+            var taskData = await _context.Tasks
+                .Where(t => t.IsDeleted == 0)
+                .GroupBy(t => t.Status) // DÝKKAT: Task modelinde durum kolonu 'Status' mu? Deðilse düzelt.
+                .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            // 4. ADIM: VIEWMODEL OLUÞTUR
             var model = new DashboardViewModel
             {
-                // Tabloda gösterilecek liste
                 Customers = activeCustomers,
-
-                // Hesaplanan Sayaçlar
                 TotalCustomers = totalCustomers,
                 TotalTasks = totalTasks,
+                TotalNotes = totalNotes,
 
-                // >>> YENÝ EKLENEN NOT SAYISI <<<
-                TotalNotes = totalNotes
+                // Grafik Verilerini Doldur
+                CustomerGraphLabels = groupedCustomers.Select(x => x.Month).ToList(),
+                CustomerGraphValues = groupedCustomers.Select(x => x.Count).ToList(),
+
+                TaskStatusLabels = taskData.Select(x => x.Status.ToString() ?? "Belirsiz").ToList(),
+                TaskStatusValues = taskData.Select(x => x.Count).ToList()
             };
 
             return View(model);
