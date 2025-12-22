@@ -4,10 +4,6 @@ Overview
 
 This is a Customer Relationship Management (CRM) system currently under development, built with .NET 9.0 and a MySQL database. The system is designed to help manage customers, tasks, reports, and settings efficiently in a web-based environment.
 
-Status
-
-⚠️ Note: This project is still under development. Features may change, and some functionalities might not be fully implemented yet.
-
 Features
 
 Customer Management: Add, edit, and delete customers.
@@ -30,9 +26,6 @@ Genel Bakış
 
 Bu proje, .NET 9.0 ve MySQL veritabanı kullanılarak geliştirilmiş bir Müşteri İlişkileri Yönetimi (CRM) sistemidir ve henüz geliştirilme aşamasındadır. Sistem, müşteri yönetimi, görev takibi, raporlar ve ayarları web tabanlı bir ortamda yönetmeyi kolaylaştırmayı amaçlamaktadır.
 
-Durum
-
-⚠️ Not: Bu proje geliştirilme aşamasındadır. Özellikler değişebilir ve bazı fonksiyonlar henüz tamamlanmamış olabilir.
 
 Özellikler
 
