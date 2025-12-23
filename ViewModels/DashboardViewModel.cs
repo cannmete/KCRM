@@ -16,6 +16,7 @@ namespace KCRM.ViewModels
 
         public List<string> TaskStatusLabels { get; set; } = new List<string>();
         public List<int> TaskStatusValues { get; set; } = new List<int>();
+        public IEnumerable<Deal> RecentDeals { get; set; }
     }
 
 }

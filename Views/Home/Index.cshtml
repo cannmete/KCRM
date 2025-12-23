@@ -86,7 +86,7 @@
 </div>
 
 <div class="row mb-4">
-    <div class="col-lg-6 mb-4 mb-lg-0">
+    <div class="col-lg-12 mb-4">
         <section class="card h-100">
             <header class="card-header">
                 <h2 class="card-title">Aylık Müşteri Kayıtları</h2>
@@ -99,16 +99,78 @@
             </div>
         </section>
     </div>
+</div>
 
-    <div class="col-lg-6">
+<div class="row mb-4">
+    <div class="col-lg-4 mb-4 mb-lg-0">
         <section class="card h-100">
             <header class="card-header">
                 <h2 class="card-title">Görev Durum Dağılımı</h2>
-                <p class="card-subtitle">Görevlerin statülerine göre dağılımı</p>
             </header>
             <div class="card-body">
-                <div class="chart-container" style="position: relative; height:300px; width:100%">
+                <div class="chart-container" style="position: relative; height:250px; width:100%">
                     <canvas id="taskChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-lg-8">
+        <section class="card h-100">
+            <header class="card-header">
+                <div class="card-actions">
+                    <a href="@Url.Action("Index", "Deals")" class="card-action card-action-toggle" data-card-toggle></a>
+                </div>
+                <h2 class="card-title">Son Fırsatlar & Teklifler</h2>
+            </header>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Başlık</th>
+                                <th>Müşteri</th>
+                                <th>Tutar</th>
+                                <th>Aşama</th>
+                                <th class="text-end">İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.RecentDeals != null && Model.RecentDeals.Any())
+                            {
+                                foreach (var deal in Model.RecentDeals)
+                                {
+                                    <tr>
+                                        <td class="font-weight-bold">@deal.Title</td>
+                                        <td>@(deal.Customer?.FullName ?? "-")</td>
+                                        <td class="text-success">@deal.Amount.ToString("C0")</td>
+                                        <td>
+                                            @{
+                                                string badgeClass = "badge-dark";
+                                                // Enum kontrolü veya string kontrolü
+                                                if (deal.Stage.ToString() == "Won" || deal.Stage.ToString() == "Kazanıldı") { badgeClass = "badge-success"; }
+                                                else if (deal.Stage.ToString() == "Lost" || deal.Stage.ToString() == "Kaybedildi") { badgeClass = "badge-danger"; }
+                                                else if (deal.Stage.ToString() == "New" || deal.Stage.ToString() == "Yeni") { badgeClass = "badge-info"; }
+                                                else { badgeClass = "badge-warning"; }
+                                            }
+                                            <span class="badge @badgeClass">@deal.Stage</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="@Url.Action("Details", "Deals", new { id = deal.Id })" class="btn btn-xs btn-default text-primary">
+                                                <i class="fas fa-arrow-right"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted p-3">Henüz teklif bulunmuyor.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </section>

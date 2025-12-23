@@ -28,7 +28,6 @@ namespace KCRM.Controllers
         {
             // 1. ADIM: ÝSTATÝSTÝKLERÝ HESAPLA (VERÝTABANI TARAFLI)
             // Verileri RAM'e çekmeden, doðrudan veritabanýnda saydýrýyoruz (CountAsync).
-            // Bu yöntem çok daha hýzlýdýr ve performans dostudur.
 
             // Silinmemiþ (Aktif) Müþteri Sayýsý
             int totalCustomers = await _context.Customers
@@ -38,7 +37,7 @@ namespace KCRM.Controllers
             int totalTasks = await _context.Tasks
                 .CountAsync(t => t.IsDeleted == 0);
 
-            // >>> YENÝ EKLENEN: Silinmemiþ (Aktif) Not Sayýsý <<<
+            // Silinmemiþ (Aktif) Not Sayýsý
             int totalNotes = await _context.Notes
                 .CountAsync(n => n.IsDeleted == 0);
 
@@ -46,18 +45,16 @@ namespace KCRM.Controllers
             // 2. ADIM: TABLO ÝÇÝN LÝSTEYÝ ÇEK
             // Dashboard'da tüm binlerce müþteriyi göstermek yerine, 
             // genellikle "Son Eklenen 10 Müþteri" veya "Tüm Müþteriler" listelenir.
-            // Burada sizin yapýnýzý koruyarak listeyi çekiyoruz ama "IsDeleted" filtresi ekliyoruz.
 
             var activeCustomers = await _context.Customers
                 .Include(c => c.Tasks) // Görev sayýsýný tabloda göstermek için Include þart
                 .Where(c => c.IsDeleted == 0) // Sadece silinmemiþleri getir
-                .OrderByDescending(c => c.CreatedAt) // (Opsiyonel) En yeniler üstte görünsün
+                .OrderByDescending(c => c.CreatedAt) // En yeniler üstte görünsün
                 .ToListAsync();
 
-            // --- 3. ADIM: GRAFÝK VERÝLERÝNÝ HAZIRLA (YENÝ) ---
+            // --- 3. ADIM: GRAFÝK VERÝLERÝNÝ VE TEKLÝFLERÝ HAZIRLA ---
 
             // A) Son 6 Ayda Eklenen Müþteriler (Line Chart)
-            // Veritabanýndan tarihleri çekip RAM'de grupluyoruz (EF Core sürümüne göre deðiþebilir, bu en güvenli yöntem)
             var customerData = await _context.Customers
                 .Where(c => c.IsDeleted == 0 && c.CreatedAt >= DateTime.Now.AddMonths(-6))
                 .OrderBy(c => c.CreatedAt)
@@ -70,12 +67,17 @@ namespace KCRM.Controllers
                 .ToList();
 
             // B) Görev Durum Daðýlýmý (Doughnut Chart)
-            // Task modelinde "Status" adýnda bir string veya enum olduðunu varsayýyorum.
-            // Eðer yoksa burayý kendi kolon adýna göre güncellemelisin.
             var taskData = await _context.Tasks
                 .Where(t => t.IsDeleted == 0)
-                .GroupBy(t => t.Status) // DÝKKAT: Task modelinde durum kolonu 'Status' mu? Deðilse düzelt.
+                .GroupBy(t => t.Status)
                 .Select(g => new { Status = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            // C) >>> YENÝ EKLENEN KISIM: Son 5 Fýrsat/Teklif <<<
+            var recentDeals = await _context.Deals
+                .Include(d => d.Customer) // Müþteri adýný tabloda göstermek için
+                .OrderByDescending(d => d.CreatedAt) // En yeniden eskiye
+                .Take(5) // Sadece 5 tane
                 .ToListAsync();
 
             // 4. ADIM: VIEWMODEL OLUÞTUR
@@ -91,7 +93,10 @@ namespace KCRM.Controllers
                 CustomerGraphValues = groupedCustomers.Select(x => x.Count).ToList(),
 
                 TaskStatusLabels = taskData.Select(x => x.Status.ToString() ?? "Belirsiz").ToList(),
-                TaskStatusValues = taskData.Select(x => x.Count).ToList()
+                TaskStatusValues = taskData.Select(x => x.Count).ToList(),
+
+                // Yeni Teklif Listesini Modele Ekle
+                RecentDeals = recentDeals
             };
 
             return View(model);
