@@ -1,0 +1,78 @@
+﻿@model KCRM.Models.Deal
+
+@{
+    ViewData["Title"] = "Fırsatı Düzenle";
+    Layout = "~/Views/Shared/_LayoutPorto.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-8 offset-lg-2">
+        <section class="card">
+            <header class="card-header">
+                <h2 class="card-title">Fırsatı Düzenle: @Model.Title</h2>
+            </header>
+            <div class="card-body">
+                <form asp-action="Edit">
+                    <input type="hidden" asp-for="Id" />
+                    <input type="hidden" asp-for="UserId" />
+                    <input type="hidden" asp-for="CreatedAt" />
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group row pb-3">
+                        <label asp-for="Title" class="col-lg-3 control-label text-lg-end pt-2">Fırsat Başlığı</label>
+                        <div class="col-lg-9">
+                            <input asp-for="Title" class="form-control" />
+                            <span asp-validation-for="Title" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row pb-3">
+                        <label asp-for="CustomerId" class="col-lg-3 control-label text-lg-end pt-2">Müşteri</label>
+                        <div class="col-lg-9">
+                            <select asp-for="CustomerId" class="form-control" asp-items="ViewBag.CustomerId"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row pb-3">
+                        <label asp-for="Amount" class="col-lg-3 control-label text-lg-end pt-2">Tutar</label>
+                        <div class="col-lg-9">
+                            <div class="input-group">
+                                <span class="input-group-text">₺</span>
+                                <input asp-for="Amount" class="form-control" type="number" step="0.01" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row pb-3">
+                        <label asp-for="Stage" class="col-lg-3 control-label text-lg-end pt-2">Aşama</label>
+                        <div class="col-lg-9">
+                            <select asp-for="Stage" class="form-control" asp-items="Html.GetEnumSelectList<KCRM.Models.DealStage>()"></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group row pb-3">
+                        <label asp-for="ClosingDate" class="col-lg-3 control-label text-lg-end pt-2">Kapanış Tarihi</label>
+                        <div class="col-lg-9">
+                            <input asp-for="ClosingDate" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group row pb-3">
+                        <label asp-for="Description" class="col-lg-3 control-label text-lg-end pt-2">Açıklama</label>
+                        <div class="col-lg-9">
+                            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <div class="col-lg-9 offset-lg-3">
+                            <button type="submit" class="btn btn-primary">Güncelle</button>
+                            <a asp-action="Index" class="btn btn-default">Geri Dön</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>

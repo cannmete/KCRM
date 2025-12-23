@@ -1,0 +1,144 @@
+﻿@model IEnumerable<KCRM.Models.Deal>
+
+@{
+    ViewData["Title"] = "Fırsatlar";
+    Layout = "~/Views/Shared/_LayoutPorto.cshtml";
+}
+
+<header class="page-header d-flex justify-content-between align-items-center mb-3">
+    <h2>Satış Fırsatları</h2>
+    <div class="right-wrapper text-end me-3">
+        <a asp-action="Create" class="btn btn-success">
+            <i class="fas fa-plus"></i> Yeni Fırsat Ekle
+        </a>
+    </div>
+</header>
+
+<section class="card">
+    <header class="card-header">
+        <h2 class="card-title">Tüm Fırsatlar</h2>
+    </header>
+    <div class="card-body">
+        <table class="table table-bordered table-striped mb-0" id="datatable-default">
+            <thead>
+                <tr>
+                    <th>Başlık</th>
+                    <th>Müşteri</th>
+                    <th>Tutar</th>
+                    <th style="min-width: 180px;">Aşama / İşlem</th>
+                    <th>Kapanış Tarihi</th>
+                    <th class="text-end">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="font-weight-bold text-dark align-middle">@item.Title</td>
+                        <td class="align-middle">
+                            @if (item.Customer != null)
+                            {
+                                <a asp-controller="Customer" asp-action="Details" asp-route-id="@item.CustomerId">
+                                    @item.Customer.FullName
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Müşteri Silinmiş</span>
+                            }
+                        </td>
+                        <td class="align-middle">@item.Amount.ToString("C2")</td>
+
+                        <td class="align-middle">
+                            @{
+                                string badgeClass = "badge-dark";
+                                switch (item.Stage)
+                                {
+                                    case KCRM.Models.DealStage.New: badgeClass = "badge-info"; break;
+                                    case KCRM.Models.DealStage.Qualification: badgeClass = "badge-primary"; break;
+                                    case KCRM.Models.DealStage.Proposal: badgeClass = "badge-warning"; break;
+                                    case KCRM.Models.DealStage.Negotiation: badgeClass = "badge-dark"; break;
+                                    case KCRM.Models.DealStage.Won: badgeClass = "badge-success"; break;
+                                    case KCRM.Models.DealStage.Lost: badgeClass = "badge-danger"; break;
+                                }
+                            }
+                            <div class="mb-2">
+                                <span class="badge @badgeClass" style="font-size: 0.85em; width: 100%;">@Html.DisplayFor(modelItem => item.Stage)</span>
+                            </div>
+
+                            <div class="text-center">
+                                @switch (item.Stage)
+                                {
+                                    case KCRM.Models.DealStage.New:
+                                        <form asp-action="ChangeStage" method="post">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="stage" value="@KCRM.Models.DealStage.Qualification" />
+                                            <button type="submit" class="btn btn-xs btn-default text-primary w-100" title="Bir sonraki aşamaya geç">
+                                                İlerle: Görüşülüyor <i class="fas fa-arrow-right ms-1"></i>
+                                            </button>
+                                        </form>
+                                        break;
+
+                                    case KCRM.Models.DealStage.Qualification:
+                                        <form asp-action="ChangeStage" method="post">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="stage" value="@KCRM.Models.DealStage.Proposal" />
+                                            <button type="submit" class="btn btn-xs btn-default text-primary w-100">
+                                                İlerle: Teklif Verildi <i class="fas fa-arrow-right ms-1"></i>
+                                            </button>
+                                        </form>
+                                        break;
+
+                                    case KCRM.Models.DealStage.Proposal:
+                                        <form asp-action="ChangeStage" method="post">
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="stage" value="@KCRM.Models.DealStage.Negotiation" />
+                                            <button type="submit" class="btn btn-xs btn-default text-primary w-100">
+                                                İlerle: Pazarlık <i class="fas fa-arrow-right ms-1"></i>
+                                            </button>
+                                        </form>
+                                        break;
+
+                                    case KCRM.Models.DealStage.Negotiation:
+                                        <div class="btn-group btn-group-xs d-flex" role="group">
+                                            <form asp-action="ChangeStage" method="post" class="flex-fill">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="stage" value="@KCRM.Models.DealStage.Won" />
+                                                <button type="submit" class="btn btn-xs btn-success w-100" style="border-top-right-radius: 0; border-bottom-right-radius: 0;">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </form>
+                                            <form asp-action="ChangeStage" method="post" class="flex-fill">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <input type="hidden" name="stage" value="@KCRM.Models.DealStage.Lost" />
+                                                <button type="submit" class="btn btn-xs btn-danger w-100" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        break;
+
+                                    case KCRM.Models.DealStage.Won:
+                                    case KCRM.Models.DealStage.Lost:
+                                        <small class="text-muted"><i class="fas fa-lock"></i> Tamamlandı</small>
+                                        break;
+                                }
+                            </div>
+                        </td>
+
+                        <td class="align-middle">
+                            @(item.ClosingDate.HasValue? item.ClosingDate.Value.ToShortDateString() : "-")
+                        </td>
+                        <td class="text-end align-middle">
+                            <div class="btn-group">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-xs btn-warning" title="Düzenle"><i class="fas fa-pencil-alt"></i></a>
+                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-xs btn-info" title="Detaylar"><i class="fas fa-search"></i></a>
+                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-xs btn-danger" title="Sil"><i class="fas fa-trash"></i></a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</section>

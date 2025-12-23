@@ -1,0 +1,38 @@
+﻿@model KCRM.Models.Deal
+
+@{
+    ViewData["Title"] = "Sil";
+    Layout = "~/Views/Shared/_LayoutPorto.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-6 offset-lg-3">
+        <section class="card card-danger">
+            <header class="card-header">
+                <h2 class="card-title">Silme Onayı</h2>
+            </header>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <strong>Dikkat!</strong> "@Model.Title" başlıklı fırsatı silmek üzeresiniz. Bu işlem geri alınamaz (çöp kutusuna taşınır).
+                </div>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Başlık</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Title)</dd>
+
+                    <dt class="col-sm-4">Tutar</dt>
+                    <dd class="col-sm-8">@Model.Amount.ToString("C2")</dd>
+
+                    <dt class="col-sm-4">Müşteri</dt>
+                    <dd class="col-sm-8">@Html.DisplayFor(model => model.Customer.FullName)</dd>
+                </dl>
+
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="Id" />
+                    <button type="submit" class="btn btn-danger">Evet, Sil</button>
+                    <a asp-action="Index" class="btn btn-default">İptal</a>
+                </form>
+            </div>
+        </section>
+    </div>
+</div>

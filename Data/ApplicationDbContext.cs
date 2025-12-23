@@ -15,6 +15,7 @@ namespace KCRM.Data
         public DbSet<TaskItem> Tasks => Set<TaskItem>();
         public DbSet<Notes> Notes { get; set; }
         public DbSet<Lead> Leads { get; set; }
+        public DbSet<Deal> Deals { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -58,6 +59,22 @@ namespace KCRM.Data
                 entity.Property(e => e.Content).HasColumnType("varchar(500)").IsRequired();
                 entity.Property(e => e.UserId).HasColumnType("int").IsRequired();
                 entity.Property(e => e.IsDeleted).HasColumnType("int").HasDefaultValue(0);
+            });
+
+            // Deal
+            modelBuilder.Entity<Deal>(entity =>
+            {
+                entity.Property(e => e.Title).HasColumnType("varchar(150)").IsRequired();
+                entity.Property(e => e.Description).HasColumnType("varchar(500)");
+                entity.Property(e => e.Amount).HasColumnType("decimal(18,2)").HasDefaultValue(0);
+                entity.Property(e => e.IsDeleted).HasColumnType("int").HasDefaultValue(0);
+                entity.Property(e => e.CreatedAt).HasColumnType("datetime");
+
+                // İlişki: Bir fırsat silinirse müşteri silinmesin (Restrict)
+                entity.HasOne(d => d.Customer)
+                      .WithMany(c => c.Deals)
+                      .HasForeignKey(d => d.CustomerId)
+                      .OnDelete(DeleteBehavior.Restrict);
             });
         }
     }

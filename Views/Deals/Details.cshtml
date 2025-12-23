@@ -1,0 +1,133 @@
+﻿@model KCRM.Models.Deal
+
+@{
+    ViewData["Title"] = "Detaylar";
+    Layout = "~/Views/Shared/_LayoutPorto.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <section class="card">
+            <header class="card-header">
+                <h2 class="card-title">@Model.Title</h2>
+                <p class="card-subtitle">Oluşturulma: @Model.CreatedAt.ToShortDateString()</p>
+            </header>
+            <div class="card-body">
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Müşteri:</strong>
+                        <p class="text-primary" style="font-size: 1.1em;">
+                            @if (Model.Customer != null)
+                            {
+                                <a asp-controller="Customer" asp-action="Details" asp-route-id="@Model.CustomerId" class="text-decoration-none">
+                                    <i class="fas fa-user me-1"></i> @Model.Customer.FullName
+                                </a>
+                            }
+                            else
+                            {
+                                <span>-</span>
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Tutar:</strong>
+                        <h3 class="text-success mt-0 font-weight-bold">@Model.Amount.ToString("C2")</h3>
+                    </div>
+                </div>
+
+                <hr class="solid short" />
+
+                <div class="row">
+                    <div class="col-md-4">
+                        <strong>Aşama:</strong>
+                        <br />
+                        <span class="badge badge-dark p-2 mt-1" style="font-size: 1em;">@Model.Stage</span>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Tahmini Kapanış:</strong>
+                        <p class="text-dark font-weight-bold">@(Model.ClosingDate.HasValue? Model.ClosingDate.Value.ToShortDateString() : "Belirtilmemiş")</p>
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Sorumlu:</strong>
+                        <p>@(Model.User != null ? Model.User.Username : "-")</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <strong>Açıklama:</strong>
+                    <div class="p-3 bg-light rounded border mt-2">
+                        @if (!string.IsNullOrEmpty(Model.Description))
+                        {
+                            @Model.Description
+                        }
+                        else
+                        {
+                            <em class="text-muted">Açıklama girilmemiş.</em>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-default"><i class="fas fa-arrow-left me-1"></i> Listeye Dön</a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning text-white"><i class="fas fa-pencil-alt me-1"></i> Düzenle</a>
+            </div>
+        </section>
+    </div>
+
+    <div class="col-md-4">
+
+        <section class="card card-featured card-featured-info mb-4">
+            <div class="card-body">
+                <div class="widget-summary">
+                    <div class="widget-summary-col widget-summary-col-icon">
+                        <div class="summary-icon bg-info">
+                            <i class="fas fa-info"></i>
+                        </div>
+                    </div>
+                    <div class="widget-summary-col">
+                        <div class="summary">
+                            <h4 class="title">Bilgi</h4>
+                            <div class="info">
+                                <span class="text-muted">Fırsat ile ilgili gelişmeleri görmek için Müşteri profiline giderek not ekleyebilirsiniz. Eklediğiniz notlar burada da görünecektir.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <header class="card-header">
+                <h2 class="card-title">Notlar</h2>
+            </header>
+            <div class="card-body">
+                @if (Model.Customer != null && Model.Customer.Notes != null && Model.Customer.Notes.Any(n => n.IsDeleted == 0))
+                {
+                    <ul class="list-unstyled mb-0">
+                        @foreach (var note in Model.Customer.Notes.Where(n => n.IsDeleted == 0).OrderByDescending(n => n.CreatedAt))
+                        {
+                            <li class="mb-3 pb-3 border-bottom">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <span class="text-dark font-weight-bold">
+                                        <i class="far fa-clock me-1 text-muted"></i>
+                                        @note.CreatedAt.ToString("dd.MM.yyyy HH:mm")
+                                    </span>
+                                </div>
+                                <p class="mb-0 text-muted">@note.Content</p>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <div class="alert alert-info mb-0">
+                        Bu müşteriye ait henüz bir not bulunmuyor.
+                    </div>
+                }
+            </div>
+        </section>
+
+    </div>
+</div>
