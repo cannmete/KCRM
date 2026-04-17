@@ -150,6 +150,267 @@
 
 
     @await RenderSectionAsync("Scripts", required: false)
+
+    <style>
+        /* Widget Temel Yerleşimi */
+        #ai-chat-widget {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Yuvarlak Açma/Kapama Butonu */
+        #ai-chat-toggle {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: transform 0.3s ease, background-color 0.3s;
+        }
+
+            #ai-chat-toggle:hover {
+                background-color: #1d4ed8;
+                transform: scale(1.05);
+            }
+
+        /* Sohbet Penceresi */
+        #ai-chat-window {
+            display: none;
+            width: 350px;
+            height: 500px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+            #ai-chat-window.active {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        /* Üst Başlık (Header) */
+        .ai-chat-header {
+            background-color: #2563eb;
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Kapatma İkonu */
+        .ai-chat-close {
+            cursor: pointer;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        /* Sohbet Akışı (Body) */
+        .ai-chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Mesaj Balonları */
+        .ai-message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+
+            .ai-message.bot {
+                background-color: #e2e8f0;
+                color: #1e293b;
+                align-self: flex-start;
+                border-bottom-left-radius: 2px;
+            }
+
+            .ai-message.user {
+                background-color: #2563eb;
+                color: white;
+                align-self: flex-end;
+                border-bottom-right-radius: 2px;
+            }
+
+        /* Alt Kısım (Footer - Input) */
+        .ai-chat-footer {
+            padding: 15px;
+            background-color: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 10px;
+        }
+
+            .ai-chat-footer input {
+                flex: 1;
+                padding: 10px 15px;
+                border: 1px solid #cbd5e1;
+                border-radius: 20px;
+                outline: none;
+                font-size: 14px;
+            }
+
+                .ai-chat-footer input:focus {
+                    border-color: #2563eb;
+                }
+
+            .ai-chat-footer button {
+                background-color: #2563eb;
+                color: white;
+                border: none;
+                border-radius: 20px;
+                padding: 0 15px;
+                cursor: pointer;
+                font-weight: 600;
+                transition: background-color 0.2s;
+            }
+
+                .ai-chat-footer button:hover {
+                    background-color: #1d4ed8;
+                }
+
+        /* Yazıyor animasyonu için minik bir css */
+        .typing-indicator {
+            font-style: italic;
+            color: #64748b;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+    </style>
+
+    <div id="ai-chat-widget">
+        <div id="ai-chat-window" style="display: none;">
+            <div class="ai-chat-header">
+                <span>KCRM Asistan</span>
+                <span class="ai-chat-close" onclick="toggleChat()">×</span>
+            </div>
+            <div class="ai-chat-body" id="ai-chat-body">
+                <div class="ai-message bot">Merhaba! CRM sistemine hoş geldin. Sana nasıl yardımcı olabilirim?</div>
+            </div>
+            <div class="ai-chat-footer">
+                <input type="text" id="ai-chat-input" placeholder="Mesajınızı yazın..." onkeypress="handleKeyPress(event)" autocomplete="off" />
+                <button onclick="sendMessage()">Gönder</button>
+            </div>
+        </div>
+        <button id="ai-chat-toggle" onclick="toggleChat()">💬 Asistan</button>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('ai-chat-window');
+        const chatBody = document.getElementById('ai-chat-body');
+        const chatInput = document.getElementById('ai-chat-input');
+
+        // Pencereyi açıp kapatma ve animasyon tetikleme
+        function toggleChat() {
+            if (chatWindow.style.display === 'none') {
+                chatWindow.style.display = 'flex';
+                // Küçük bir gecikme ile opacity/transform animasyonunu başlat
+                setTimeout(() => chatWindow.classList.add('active'), 10);
+                chatInput.focus();
+            } else {
+                chatWindow.classList.remove('active');
+                // Animasyonun bitmesini bekleyip display none yap
+                setTimeout(() => chatWindow.style.display = 'none', 300);
+            }
+        }
+
+        // Enter tuşuna basıldığında mesajı gönder
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        // Mesaj Ekleme Yardımcı Fonksiyonu
+        function appendMessage(text, sender) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('ai-message', sender);
+            msgDiv.textContent = text;
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight; // En alta kaydır
+        }
+
+        // Yazıyor... göstergesi
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.id = 'typing-indicator';
+            typingDiv.classList.add('ai-message', 'bot', 'typing-indicator');
+            typingDiv.textContent = 'Asistan yazıyor...';
+            chatBody.appendChild(typingDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typingDiv = document.getElementById('typing-indicator');
+            if (typingDiv) {
+                typingDiv.remove();
+            }
+        }
+
+        // .NET API'sine istek atma
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // Kullanıcı mesajını ekrana bas ve inputu temizle
+            appendMessage(text, 'user');
+            chatInput.value = '';
+
+            // Bota istek atıldığını göster
+            showTyping();
+
+            try {
+                // C# ChatController'a Fetch API ile JSON gönderiyoruz
+                const response = await fetch('/api/chat/send', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ Message: text })
+                });
+
+                removeTyping();
+
+                if (response.ok) {
+                    const data = await response.json();
+                    // Controller'dan dönen { response: "..." } objesini yakalıyoruz
+                    appendMessage(data.response, 'bot');
+                } else {
+                    appendMessage('Üzgünüm, şu an sunucuya bağlanamıyorum.', 'bot');
+                }
+            } catch (error) {
+                removeTyping();
+                console.error('API Hatası:', error);
+                appendMessage('Bağlantı hatası oluştu.', 'bot');
+            }
+        }
+    </script>
 </body>
 
 </html>
