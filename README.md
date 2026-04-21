@@ -20,6 +20,8 @@ Responsive Design: Works on desktop and mobile devices.
 
 Icons & UI Enhancements: Uses Font Awesome for icons.
 
+URGENT: The API Keys which is inside the codes are expired. You have to change them.
+
 # K-CRM 
 
 Genel Bakış
@@ -42,3 +44,5 @@ Kimlik Doğrulama: Giriş, çıkış ve güvenli kullanıcı oturumları.
 Responsive Tasarım: Masaüstü ve mobil cihazlarda çalışır.
 
 İkonlar & UI Geliştirmeleri: Font Awesome ikonları kullanılmıştır.
+
+ÖNEMLİ: Projenin içerisindeki API Key'ler geçersizdir. Projenin çalışması için kendi anahtarlarınızı kullanmalısınız.
