@@ -20,7 +20,7 @@ Responsive Design: Works on desktop and mobile devices.
 
 Icons & UI Enhancements: Uses Font Awesome for icons.
 
-URGENT: The API Keys which is inside the codes are expired. You have to change them.
+URGENT: The API Keys which are inside the codes are expired. You have to change them.
 
 # K-CRM 
 
